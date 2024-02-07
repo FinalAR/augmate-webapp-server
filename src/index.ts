@@ -21,6 +21,11 @@ app.get("/", (req: Request, res: Response) => {
   res.send("Augmate Backend");
 });
 
+
+app.get('/ping', (_req: Request, res: Response) => {
+  return res.send('pong 🏓')
+})
+
 app.listen(port, () => {
   console.log(`[server]: Server is running at http://localhost:${port}`);
 });
