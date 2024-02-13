@@ -1,8 +1,8 @@
 "use strict";
 // import { NextFunction, Request, Response } from 'express';
 // import { jsonAll } from '../utils/general';
-// import Role from '../models/role';
-// //CREATE AUTOMATIC ROLE AT FIRST WHEN WE CREATE NEW DB
+// import Role , {IRoleModel} from '../models/role';
+//CREATE AUTOMATIC ROLE AT FIRST WHEN WE CREATE NEW DB
 // export function crateRole() {
 //     Role.estimatedDocumentCount((err: any, count: number) => {
 //         if (!err && count === 0) {
@@ -34,13 +34,14 @@
 //         };
 //         const count = await Role.countDocuments({});
 //         //GETING DATA FROM TABLE
-//         const roles = await Role.find()
-//             .limit(pageOptions.limit * 1)
-//             .skip((pageOptions.page - 1) * pageOptions.limit)
-//             .sort({ createdAt: -1 });
+//         //const roles: IRoleModel[] = await Role.find();
+//             // .limit(pageOptions.limit * 1)
+//             // .skip((pageOptions.page - 1) * pageOptions.limit)
+//             // .sort({ createdAt: -1 });
 //         //CREATE RESPONSE
+//         const roless: IRole[] = await Role.find();
 //         const result = {
-//             roles,
+//             roless,
 //         };
 //         //CREATE PAGINATION
 //         const meta = {
@@ -50,7 +51,7 @@
 //             currentPage: pageOptions.page,
 //         };
 //         //SEND RESPONSE
-//         return jsonAll(res, 201, result, meta);
+//         return jsonAll(res, 200, result, meta);
 //     } catch (error) {
 //         next(error);
 //     }

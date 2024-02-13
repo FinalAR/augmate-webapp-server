@@ -1,13 +1,17 @@
 "use strict";
-// import chalk from'chalk';
-// export default class Logging {
-//     // public static log = (args:any)=> this.info(args);
-//     public static log= (args:any)=> this.info(args)
-//     public static info=(args:any)=>console.log(chalk.blue(`[${new Date().toLocaleString()}][INFO]`),
-//     typeof args ==='string'?chalk.blueBright(args):args);
-//     public static warn=(args:any)=>console.log(chalk.yellow(`[${new Date().toLocaleString()}][INFO]`),
-//     typeof args ==='string'?chalk.yellowBright(args):args);
-//     public static error=(args:any)=>console.log(chalk.red(`[${new Date().toLocaleString()}][INFO]`),
-//     typeof args ==='string'?chalk.redBright(args):args);
-// }
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+var _a;
+Object.defineProperty(exports, "__esModule", { value: true });
+const chalk_1 = __importDefault(require("chalk"));
+class Logging {
+}
+_a = Logging;
+Logging.log = (args) => _a.info(args);
+Logging.info = (args) => console.log(chalk_1.default.blue(`[${new Date().toLocaleString()}][INFO]`), typeof args === 'string' ? chalk_1.default.blueBright(args) : args);
+Logging.warn = (args) => console.log(chalk_1.default.yellow(`[${new Date().toLocaleString()}][WARN]`), typeof args === 'string' ? chalk_1.default.yellowBright(args) : args);
+Logging.debug = (args) => console.log(chalk_1.default.green(`[${new Date().toLocaleString()}][DEBUG]`), typeof args === 'string' ? chalk_1.default.greenBright(args) : args);
+Logging.error = (args) => console.log(chalk_1.default.red(`[${new Date().toLocaleString()}][ERROR]`), typeof args === 'string' ? chalk_1.default.redBright(args) : args);
+exports.default = Logging;
 //# sourceMappingURL=Logging.js.map
