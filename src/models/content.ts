@@ -43,18 +43,16 @@ const ContentSchema: Schema = new Schema(
         },
         createdDate: {
             type: String,
-            required: true,
             default: '2000-01-12T08:30:00.000Z',
         },
         lastUpdatedDate: {
             type: String,
-            required: true,
             default: '2000-01-12T08:30:00.000Z',
         },
         ref_ver: {
             type: Number,
             required: true,
-            default: '1',
+            default: 1,
         },
     },
     { timestamps: true }

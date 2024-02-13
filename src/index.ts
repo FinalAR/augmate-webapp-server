@@ -39,7 +39,7 @@ const StartServer = async () => {
 
     router.use((req, res, next) => {
         Logging.info(
-            `Incomming -> Method: [${req.method}] - url: [${req.url}] - IP: [${req.socket.remoteAddress}]`
+            `Incomming -> Method: [${req.method}] - url: [${req.url}] - IP: [${req.socket.remoteAddress}] - Body: [${req.body}]`
         );
         res.on('finish', () => {
             Logging.info(

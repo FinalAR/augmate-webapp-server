@@ -45,7 +45,7 @@ const StartServer = () => __awaiter(void 0, void 0, void 0, function* () {
     // Logging.info('SMTP Server Connected');
     // Logging.info('SMTP Connection verified');
     router.use((req, res, next) => {
-        Logging_1.default.info(`Incomming -> Method: [${req.method}] - url: [${req.url}] - IP: [${req.socket.remoteAddress}]`);
+        Logging_1.default.info(`Incomming -> Method: [${req.method}] - url: [${req.url}] - IP: [${req.socket.remoteAddress}] - Body: [${req.body}]`);
         res.on('finish', () => {
             Logging_1.default.info(`Incomming -> Method: [${req.method}] - url: [${req.url}] IP: [${req.socket.remoteAddress}] - Status: [${res.statusCode}]`);
         });
