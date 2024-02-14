@@ -21,6 +21,8 @@ const createContent = (req, res, next) => __awaiter(void 0, void 0, void 0, func
     try {
         const { imageTargetSrc, modelPath, modelFile, positionY, scaleSet, size } = req.body;
         Logging_1.default.debug(`Request Body = ${req.body}`);
+        //function generate analytix matrix
+        //analyzeContent()
         const currentTimestamp = new Date().toISOString();
         //CRETA NEW USRE
         let contentData = new content_1.default({
@@ -30,6 +32,7 @@ const createContent = (req, res, next) => __awaiter(void 0, void 0, void 0, func
             positionY,
             scaleSet,
             size,
+            // generate analytic Matrix should also included or create a seperate collection and create a related document to it
             // createdDate: currentTimestamp,
             // lastUpdatedDate: currentTimestamp,
             ref_ver: 1,
@@ -112,13 +115,101 @@ const updateContent = (req, res, next) => __awaiter(void 0, void 0, void 0, func
         next(error);
     }
 });
+//DELETE CONTENT DETAILS WITH ID
+const deleteContent = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const body = req.body;
+        const contentId = req.params.contentId;
+        let content = yield content_1.default.findById(contentId);
+        //If Content not found
+        if (!content) {
+            throw new httpError_1.default({
+                title: 'bad_request',
+                detail: 'Content Not Found.',
+                code: 400,
+            });
+        }
+        yield content_1.default.findByIdAndDelete(contentId);
+        return (0, general_1.jsonOne)(res, 200, { message: 'Content deleted successfully' });
+    }
+    catch (error) {
+        next(error);
+    }
+});
+// ANALYZE CONTENT function
+function analyzeContent(levels, obj) {
+    const { high, mid, low } = obj.content;
+    let h_size = 0, h_polyCount = 0, h_animCount = 0, m_size = 0, m_polyCount = 0, m_animCount = 0, l_size = 0, l_polyCount = 0, l_animCount = 0;
+    switch (levels) {
+        case 1:
+            ({ h_size, h_polyCount, h_animCount } = high);
+            break;
+        case 2:
+            ({ h_size, h_polyCount, h_animCount } = high);
+            ({ m_size, m_polyCount, m_animCount } = mid);
+            break;
+        case 3:
+            ({ h_size, h_polyCount, h_animCount } = high);
+            ({ m_size, m_polyCount, m_animCount } = mid);
+            ({ l_size, l_polyCount, l_animCount } = low);
+            break;
+        default:
+            ({ h_size, h_polyCount, h_animCount } = high);
+            ({ m_size, m_polyCount, m_animCount } = mid);
+            ({ l_size, l_polyCount, l_animCount } = low);
+            break;
+    }
+    Logging_1.default.debug(`High: ${h_size} + ${h_polyCount} + ${h_animCount}`);
+    Logging_1.default.debug(`Mid: ${m_size} + ${m_polyCount} + ${m_animCount}`);
+    Logging_1.default.debug(`Low: ${l_size} + ${l_polyCount} + ${l_animCount}`);
+    // Perform actual analysis here...
+    //size based analysis
+    //polygonCount based analysis
+    //animCount based analysis
+    const analyticMatrix = "hi";
+    return analyticMatrix;
+}
+// //ANALYZE CONTENT
+// const analyzeContent = async (req: Request, res: Response, next: NextFunction) => {
+//     try {
+//         const { levels, high, mid, low } = req.body;
+//         let h_size, h_polyCount, h_animCount,
+//             m_size, m_polyCount, m_animCount,
+//             l_size, l_polyCount, l_animCount;
+//         switch (levels) {
+//             case 1:
+//                 ({ h_size, h_polyCount, h_animCount } = high);
+//                 break;
+//             case 2:
+//                 ({ h_size, h_polyCount, h_animCount } = high);
+//                 ({ m_size, m_polyCount, m_animCount } = mid);
+//                 break;
+//             case 3:
+//                 ({ h_size, h_polyCount, h_animCount } = high);
+//                 ({ m_size, m_polyCount, m_animCount } = mid);
+//                 ({ l_size, l_polyCount, l_animCount } = low);
+//                 break;
+//             default:
+//                 ({ h_size, h_polyCount, h_animCount } = high);
+//                 ({ m_size, m_polyCount, m_animCount } = mid);
+//                 ({ l_size, l_polyCount, l_animCount } = low);
+//                 break;
+//         }
+//         Logging.debug(`High: ${ h_size} + ${h_polyCount} + ${h_animCount}`);
+//         Logging.debug(`Mid: ${ m_size} + ${m_polyCount} + ${m_animCount}`);
+//         Logging.debug(`Low: ${ l_size} + ${l_polyCount} + ${l_animCount}`);
+//         return res.status(200).json({ message: 'Content analyzed successfully' });
+//     } catch (error) {
+//         next(error);
+//     }
+// };
 //EXPORT
 exports.default = {
-    createContent,
+    createContent, //will include the analytic matrix generating logic
     getContent,
     getAllContent,
     updateContent,
-    // deleteContent,
+    deleteContent,
     // analyzeContent,
     // findBasedOnTarget,
 };

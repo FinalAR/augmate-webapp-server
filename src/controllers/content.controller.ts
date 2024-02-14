@@ -3,6 +3,7 @@ import HttpError from '../utils/httpError';
 import { jsonOne, jsonAll } from '../utils/general';
 import Logging from '../library/Logging';
 import Content, { IContnetModel } from '../models/content';
+import { IQualityObj } from '../interfaces/contentQuality';
 
 //CREATE A CONTENT
 const createContent = async (req: Request, res: Response, next: NextFunction) => {
@@ -11,6 +12,9 @@ const createContent = async (req: Request, res: Response, next: NextFunction) =>
 
 
         Logging.debug(`Request Body = ${req.body}`);
+
+        //function generate analytix matrix
+        //analyzeContent()
 
         const currentTimestamp = new Date().toISOString();
         //CRETA NEW USRE
@@ -21,6 +25,7 @@ const createContent = async (req: Request, res: Response, next: NextFunction) =>
             positionY,
             scaleSet,
             size,
+            // generate analytic Matrix should also included or create a seperate collection and create a related document to it
             // createdDate: currentTimestamp,
             // lastUpdatedDate: currentTimestamp,
             ref_ver: 1,
@@ -119,13 +124,133 @@ const updateContent = async (req: Request, res: Response, next: NextFunction) =>
         next(error);
     }
 };
+
+
+//DELETE CONTENT DETAILS WITH ID
+const deleteContent = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const body = req.body;
+        const contentId = req.params.contentId;
+
+        let content = await Content.findById(contentId);
+        //If Content not found
+        if (!content) {
+            throw new HttpError({
+                title: 'bad_request',
+                detail: 'Content Not Found.',
+                code: 400,
+            });
+        }
+
+        await Content.findByIdAndDelete(contentId);
+
+        return jsonOne(res, 200, { message: 'Content deleted successfully' });
+
+    } catch (error) {
+        next(error);
+    }
+};
+
+
+// ANALYZE CONTENT function
+function analyzeContent(levels: number, obj: IQualityObj): string {
+    const { high, mid, low } = obj.content;
+
+    let h_size = 0, h_polyCount = 0, h_animCount = 0,
+        m_size = 0, m_polyCount = 0, m_animCount = 0,
+        l_size = 0, l_polyCount = 0, l_animCount = 0;
+
+    switch (levels) {
+        case 1:
+            ({ h_size, h_polyCount, h_animCount } = high);
+            break;
+        case 2:
+            ({ h_size, h_polyCount, h_animCount } = high);
+            ({ m_size, m_polyCount, m_animCount } = mid);
+            break;
+        case 3:
+            ({ h_size, h_polyCount, h_animCount } = high);
+            ({ m_size, m_polyCount, m_animCount } = mid);
+            ({ l_size, l_polyCount, l_animCount } = low);
+            break;
+        default:
+            ({ h_size, h_polyCount, h_animCount } = high);
+            ({ m_size, m_polyCount, m_animCount } = mid);
+            ({ l_size, l_polyCount, l_animCount } = low);
+            break;
+    }
+
+    Logging.debug(`High: ${h_size} + ${h_polyCount} + ${h_animCount}`);
+    Logging.debug(`Mid: ${m_size} + ${m_polyCount} + ${m_animCount}`);
+    Logging.debug(`Low: ${l_size} + ${l_polyCount} + ${l_animCount}`);
+
+    // Perform actual analysis here...
+
+    //size based analysis
+
+
+    //polygonCount based analysis
+
+
+    //animCount based analysis
+
+
+    const analyticMatrix = "hi";
+
+    return analyticMatrix;
+}
+
+// //ANALYZE CONTENT
+// const analyzeContent = async (req: Request, res: Response, next: NextFunction) => {
+//     try {
+//         const { levels, high, mid, low } = req.body;
+
+//         let h_size, h_polyCount, h_animCount,
+//             m_size, m_polyCount, m_animCount,
+//             l_size, l_polyCount, l_animCount;
+
+//         switch (levels) {
+//             case 1:
+//                 ({ h_size, h_polyCount, h_animCount } = high);
+//                 break;
+//             case 2:
+//                 ({ h_size, h_polyCount, h_animCount } = high);
+//                 ({ m_size, m_polyCount, m_animCount } = mid);
+//                 break;
+//             case 3:
+//                 ({ h_size, h_polyCount, h_animCount } = high);
+//                 ({ m_size, m_polyCount, m_animCount } = mid);
+//                 ({ l_size, l_polyCount, l_animCount } = low);
+//                 break;
+//             default:
+//                 ({ h_size, h_polyCount, h_animCount } = high);
+//                 ({ m_size, m_polyCount, m_animCount } = mid);
+//                 ({ l_size, l_polyCount, l_animCount } = low);
+//                 break;
+//         }
+
+//         Logging.debug(`High: ${ h_size} + ${h_polyCount} + ${h_animCount}`);
+//         Logging.debug(`Mid: ${ m_size} + ${m_polyCount} + ${m_animCount}`);
+//         Logging.debug(`Low: ${ l_size} + ${l_polyCount} + ${l_animCount}`);
+
+
+
+
+//         return res.status(200).json({ message: 'Content analyzed successfully' });
+
+//     } catch (error) {
+//         next(error);
+//     }
+// };
+
+
 //EXPORT
 export default {
-    createContent,
+    createContent,//will include the analytic matrix generating logic
     getContent,
     getAllContent,
     updateContent,
-    // deleteContent,
+    deleteContent,
     // analyzeContent,
     // findBasedOnTarget,
 };
