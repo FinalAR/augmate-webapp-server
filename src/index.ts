@@ -6,6 +6,7 @@ import Logging from './library/Logging';
 import { router as v1 } from './routes/v1/index';
 // import MailService from './services/mailService';
 import HttpError from './utils/httpError';
+import swaggerDocs from "./utils/swagger";
 
 
 const router = express();
@@ -17,6 +18,7 @@ mongoose
         Logging.info(`Running on ENV = ${process.env.NODE_ENV}`);
         Logging.info('Connected to mongoDB.');
         StartServer();
+        
     })
     .catch((error) => {
         Logging.error('Unable to connect.');
@@ -36,6 +38,10 @@ const StartServer = async () => {
     // }
     // Logging.info('SMTP Server Connected');
     // Logging.info('SMTP Connection verified');
+
+    Logging.info('Intializing Swagger Document...');
+
+    swaggerDocs(router, 5000);
 
     router.use((req, res, next) => {
         Logging.info(

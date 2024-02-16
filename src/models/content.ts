@@ -1,8 +1,91 @@
 import mongoose, { Document, Schema } from 'mongoose';
 import { IContent } from '../interfaces';
 
+/**
+ * @openapi
+ * components:
+ *   schemas:
+ *     Content:
+ *       type: object
+ *       required:
+ *        - title
+ *        - description
+ *        - price
+ *        - image
+ *       properties:
+ *         title:
+ *           type: string
+ *           default: "Canon EOS 1500D DSLR Camera with 18-55mm Lens"
+ *         description:
+ *           type: string
+ *           default: "Designed for first-time DSLR owners who want impressive results straight out of the box, capture those magic moments no matter your level with the EOS 1500D. With easy to use automatic shooting modes, large 24.1 MP sensor, Canon Camera Connect app integration and built-in feature guide, EOS 1500D is always ready to go."
+ *         price:
+ *           type: number
+ *           default: 879.99
+ *         image:
+ *           type: string
+ *           default: "https://i.imgur.com/QlRphfQ.jpg"
+ *     ContentResponse:
+ *       type: object
+ *       properties:
+ *         _id:
+ *           type: string
+ *         meshColor:
+ *           type: string
+ *           default: '0x0000ff'
+ *         modelPath:
+ *           type: string
+ *         modelFile:
+ *           type: string
+ *         progressPhase:
+ *           type: string
+ *           default: 'phase 2'    
+ *         positionY:
+ *           type: string
+ *           default: '0'
+ *         scaleSet:
+ *           type: string
+ *           default: '0.3'
+ *         size:
+ *           type: string
+ *           default: '11173332'
+ *         ref_ver:
+ *           type: number
+ *           default: 1
+ *         createdAt:
+ *           type: string
+ *         updatedAt:
+ *           type: string
+ *         __v:
+ *           type: number
+ *     ContentAllResponse:
+ *       type: object
+ *       properties:
+ *         user:
+ *           type: string
+ *         _id:
+ *           type: string
+ *         title:
+ *           type: string
+ *         description:
+ *           type: string
+ *         price:
+ *           type: number
+ *         image:
+ *           type: string
+ *         productId:
+ *           type: string
+ *         createdAt:
+ *           type: string
+ *         updatedAt:
+ *           type: string
+ *         __v:
+ *           type: number
+ *
+ */
+
 //EXPORT INTERFACE WITH MONGOOSE DOCUMENT
-export interface IContnetModel extends IContent, Document {}
+export interface IContnetModel extends IContent, Document { }
 
 //DEFINE USER SCHEMA
 const ContentSchema: Schema = new Schema(
@@ -41,14 +124,14 @@ const ContentSchema: Schema = new Schema(
             required: true,
             default: '11173332',
         },
-        createdDate: {
-            type: String,
-            default: '2000-01-12T08:30:00.000Z',
-        },
-        lastUpdatedDate: {
-            type: String,
-            default: '2000-01-12T08:30:00.000Z',
-        },
+        // createdDate: {
+        //     type: String,
+        //     default: '2000-01-12T08:30:00.000Z',
+        // },
+        // lastUpdatedDate: {
+        //     type: String,
+        //     default: '2000-01-12T08:30:00.000Z',
+        // },
         ref_ver: {
             type: Number,
             required: true,

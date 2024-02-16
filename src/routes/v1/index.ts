@@ -17,6 +17,18 @@ _router.use(function (req: Request, res: Response, next: NextFunction) {
     next();
 });
 
+  /**
+   * @openapi
+   * /api/v1/health-check:
+   *  get:
+   *     tags:
+   *     - Healthcheck
+   *     description: Responds if the app is up and running
+   *     responses:
+   *       200:
+   *         description: App is up and running
+   */
+
 // HEALTHCHECK
 _router.route('/v1/health-check').get(function (req: Request, res: Response) {
     return res.status(200).json({ healthy: true, version: 'v1' });

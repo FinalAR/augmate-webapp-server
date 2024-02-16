@@ -5,6 +5,18 @@ import Logging from '../library/Logging';
 import Content, { IContnetModel } from '../models/content';
 import { IQualityObj } from '../interfaces/contentQuality';
 
+  /**
+   * @openapi
+   * /api/v1/content/create:
+   *  post:
+   *     tags:
+   *     - Content
+   *     description: Responds if the app is up and running
+   *     responses:
+   *       200:
+   *         description: App is up and running
+   */
+
 //CREATE A CONTENT
 const createContent = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -52,6 +64,38 @@ const getContent = async (req: Request, res: Response, next: NextFunction) => {
         next(error);
     }
 };
+
+  /**
+   * @openapi
+   * '/api/v1/content/fetch':
+   *  get:
+   *     tags:
+   *     - Content
+   *     summary: Fetch All Contents
+   *     responses:
+   *       200:
+   *         description: Product List
+   *         content:
+   *          application/json:
+   *           schema:
+   *              $ref: '#/components/schemas/ContentResponse'
+   *           example:
+   *             "_id": "65cafd1a91f0f81fbfd1d499"
+   *             "meshColor": "0x0000ff"
+   *             "imageTargetSrc": "https://finalar.github.io/imageTargets/targets2.mind"
+   *             "modelPath": "https://finalar.github.io/models/SurveySet/"
+   *             "modelFile": "FoodPackDDFGH.glb"
+   *             "progressPhase": "phase 2"
+   *             "positionY": "0"
+   *             "scaleSet": "0.3"
+   *             "size": "11173332"
+   *             "createdDate": "2000-01-12T08:30:00.000Z"
+   *             "lastUpdatedDate": "2000-01-12T08:30:00.000Z"
+   *             "ref_ver": 1
+   *             "createdAt": "2024-02-13T05:24:42.484Z"
+   *             "updatedAt": "2024-02-13T05:24:42.484Z"
+   *             "__v": 0
+   */
 
 //GET ALL CONTENT LIST
 const getAllContent = async (req: Request, res: Response, next: NextFunction) => {
