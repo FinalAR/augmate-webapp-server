@@ -33,7 +33,7 @@
     "mongoose": "^8.1.2",
     "rimraf": "^5.0.5",
     "swagger-jsdoc": "^6.2.8",
-    "swagger-ui-express": "^5.0.0",
+    "swagger-ui-express": "4.6.3",
     "uuid": "^9.0.1"
   },
   "devDependencies": {
