@@ -2,7 +2,7 @@
 
 ## Technologies
 
-Typescript
+Typescript |
 NodeJS |
 express |
 swagger | 
