@@ -20,7 +20,7 @@ const Logging_1 = __importDefault(require("./library/Logging"));
 const index_1 = require("./routes/v1/index");
 // import MailService from './services/mailService';
 const httpError_1 = __importDefault(require("./utils/httpError"));
-// import swaggerDocs from "./utils/swagger";
+const swagger_1 = __importDefault(require("./utils/swagger"));
 const router = (0, express_1.default)();
 //CONNECTION TO MONGOOSE DATABASE
 mongoose_1.default
@@ -46,7 +46,7 @@ const StartServer = () => __awaiter(void 0, void 0, void 0, function* () {
     // Logging.info('SMTP Server Connected');
     // Logging.info('SMTP Connection verified');
     Logging_1.default.info('Intializing Swagger Document...');
-    // swaggerDocs(router, 5000);
+    (0, swagger_1.default)(router, 5000);
     router.use((req, res, next) => {
         Logging_1.default.info(`Incomming -> Method: [${req.method}] - url: [${req.url}] - IP: [${req.socket.remoteAddress}] - Body: [${req.body}]`);
         res.on('finish', () => {
