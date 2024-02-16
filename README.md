@@ -3,10 +3,11 @@
 ## Technologies
 
 Typescript
-NodeJS
-express
-Mongoose
-MongoDB
-chalk
-nodemon
-vercel
+NodeJS |
+express |
+swagger | 
+Mongoose |
+MongoDB |
+chalk |
+nodemon |
+vercel |
