@@ -46,7 +46,7 @@ const StartServer = () => __awaiter(void 0, void 0, void 0, function* () {
     // Logging.info('SMTP Server Connected');
     // Logging.info('SMTP Connection verified');
     Logging_1.default.info('Intializing Swagger Document...');
-    (0, swagger_1.default)(router, 5000);
+    (0, swagger_1.default)(router, 3000);
     router.use((req, res, next) => {
         Logging_1.default.info(`Incomming -> Method: [${req.method}] - url: [${req.url}] - IP: [${req.socket.remoteAddress}] - Body: [${req.body}]`);
         res.on('finish', () => {

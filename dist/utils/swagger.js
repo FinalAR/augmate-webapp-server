@@ -5,8 +5,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const swagger_jsdoc_1 = __importDefault(require("swagger-jsdoc"));
 const swagger_ui_express_1 = __importDefault(require("swagger-ui-express"));
-// import { version } from "../../package.json";
 const Logging_1 = __importDefault(require("../library/Logging"));
+// CDN CSS
+const CSS_URL = "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.3.0/swagger-ui.min.css";
 const options = {
     definition: {
         openapi: "3.0.0",
@@ -29,18 +30,18 @@ const options = {
         //   },
         // ],
     },
-    apis: ["./src/routes/v1/*.ts", "./src/controllers/*.ts", "./src/models/*.ts"],
+    apis: ["./dist/routes/v1/*.js", "./dist/controllers/*.js", "./dist/models/*.js"],
 };
 const swaggerSpec = (0, swagger_jsdoc_1.default)(options);
 function swaggerDocs(app, port) {
     // Swagger page
-    app.use("/sawgger-docs-ext", swagger_ui_express_1.default.serve, swagger_ui_express_1.default.setup(swaggerSpec));
+    app.use("/sawgger-docs-ext", swagger_ui_express_1.default.serve, swagger_ui_express_1.default.setup(swaggerSpec, { customCssUrl: CSS_URL }));
     // Docs in JSON format
     app.get("/swag-docs-ext.json", (req, res) => {
         res.setHeader("Content-Type", "application/json");
         res.send(swaggerSpec);
     });
-    Logging_1.default.info(`Docs available at http://localhost:${port}/docs`);
+    Logging_1.default.info(`Docs available at http://localhost:${port}/sawgger-docs-ext`);
 }
 exports.default = swaggerDocs;
 //# sourceMappingURL=swagger.js.map

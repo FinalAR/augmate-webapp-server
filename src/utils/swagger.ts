@@ -1,8 +1,11 @@
 import { Express, Request, Response } from "express";
 import swaggerJsdoc from "swagger-jsdoc";
 import swaggerUi from "swagger-ui-express";
-// import { version } from "../../package.json";
+import config from '../config/config';
 import log from "../library/Logging";
+
+// CDN CSS
+const CSS_URL ="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.3.0/swagger-ui.min.css";
 
 const options: swaggerJsdoc.Options = {
   definition: {
@@ -26,14 +29,14 @@ const options: swaggerJsdoc.Options = {
     //   },
     // ],
   },
-  apis: ["./src/routes/v1/*.ts", "./src/controllers/*.ts", "./src/models/*.ts"],
+  apis: ["./dist/routes/v1/*.js", "./dist/controllers/*.js", "./dist/models/*.js"],
 };
 
 const swaggerSpec = swaggerJsdoc(options);
 
 function swaggerDocs(app: Express, port: number) {
   // Swagger page
-  app.use("/sawgger-docs-ext", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+  app.use("/sawgger-docs-ext", swaggerUi.serve, swaggerUi.setup(swaggerSpec, { customCssUrl: CSS_URL }));
 
   // Docs in JSON format
   app.get("/swag-docs-ext.json", (req: Request, res: Response) => {
@@ -41,7 +44,7 @@ function swaggerDocs(app: Express, port: number) {
     res.send(swaggerSpec);
   });
 
-  log.info(`Docs available at http://localhost:${port}/docs`);
+  log.info(`Docs available at http://localhost:${port}/sawgger-docs-ext`);
 }
 
 export default swaggerDocs;

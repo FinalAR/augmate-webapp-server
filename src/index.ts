@@ -40,7 +40,7 @@ const StartServer = async () => {
     // Logging.info('SMTP Connection verified');
 
     Logging.info('Intializing Swagger Document...');
-    swaggerDocs(router, 5000);
+    swaggerDocs(router, 3000);
 
     router.use((req, res, next) => {
         Logging.info(
