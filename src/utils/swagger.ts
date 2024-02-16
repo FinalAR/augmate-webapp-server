@@ -1,7 +1,7 @@
 import { Express, Request, Response } from "express";
 import swaggerJsdoc from "swagger-jsdoc";
 import swaggerUi from "swagger-ui-express";
-import { version } from "../../package.json";
+// import { version } from "../../package.json";
 import log from "../library/Logging";
 
 const options: swaggerJsdoc.Options = {
@@ -9,7 +9,7 @@ const options: swaggerJsdoc.Options = {
     openapi: "3.0.0",
     info: {
       title: "Augmate Backend REST API Docs",
-      version,
+      version: "1.0.0",
     },
     components: {
     //   securitySchemes: {
