@@ -80,6 +80,31 @@ import { IContent } from '../interfaces';
  *         ref_ver:
  *           type: number
  *           default: 1
+ *     ExperienceContent:
+ *       type: object
+ *       properties:
+ *         meshColor:
+ *           type: string
+ *           default: '0x0000ff'
+ *         modelPath:
+ *           type: string
+ *         modelFile:
+ *           type: string
+ *         progressPhase:
+ *           type: string
+ *           default: 'phase 2'    
+ *         positionY:
+ *           type: string
+ *           default: '0'
+ *         scaleSet:
+ *           type: string
+ *           default: '0.3'
+ *         size:
+ *           type: string
+ *           default: '11173332'
+ *         ref_ver:
+ *           type: number
+ *           default: 1
  *     ContentResponse:
  *       type: object
  *       properties:

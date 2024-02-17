@@ -384,6 +384,77 @@ const deleteContent = async (req: Request, res: Response, next: NextFunction) =>
     }
 };
 
+////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * @openapi
+ * '/api/v1/content/find/{phashId}':
+ *  get:
+ *     tags:
+ *     - Content
+ *     summary: Fetch Contents by phashId
+ *     parameters:
+ *       - in: path
+ *         name: phashId
+ *         required: true
+ *         description: ID of the target to fetch
+ *         schema:
+ *           type: string
+ *           example: 65cafd1a91f0f81fbfd1d499
+ *     responses:
+ *       200:
+ *         description: Content Details
+ *         content:
+ *          application/json:
+ *           schema:
+ *              $ref: '#/components/schemas/ExperienceContent'
+ *           example:
+ *             "meshColor": "0x0000ff"
+ *             "imageTargetSrc": "https://finalar.github.io/imageTargets/targets2.mind"
+ *             "modelPath": "https://finalar.github.io/models/SurveySet/"
+ *             "modelFile": "FoodPackDDFGH.glb"
+ *             "progressPhase": "phase 2"
+ *             "positionY": "0"
+ *             "scaleSet": "0.3"
+ *             "size": "11173332"
+ *             "ref_ver": 1
+ */
+
+//FIND CONTENT DETAILS BY HASH
+const findBasedOnTarget = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const hashId = req.params.phashId;
+
+        // Fetch the specific content document from the database
+        let content = await Content.findById(hashId);
+
+        // If content is not found, return a 404 response
+        if (!content) {
+            return res.status(404).json({ message: 'Content not found' });
+        }
+
+        
+        // Extract required data for AR experience from the content document
+        const { meshColor, imageTargetSrc, modelPath, modelFile, progressPhase, positionY, scaleSet, size }= content.toObject();
+
+
+        // Create a response object including targetImage and contentImage
+        const data = {
+            meshColor: meshColor, 
+            imageTargetSrc: imageTargetSrc, 
+            modelPath: modelPath,
+            modelFile: modelFile,
+            progressPhase: progressPhase,
+            positionY: positionY,
+            scaleSet: scaleSet,
+            size: size,
+        };
+
+        return jsonOne(res, 200, data);
+    } catch (error) {
+        next(error);
+    }
+};
 
 // ANALYZE CONTENT function
 function analyzeContent(levels: number, obj: IQualityObj): string {
@@ -485,5 +556,5 @@ export default {
     updateContent,
     deleteContent,
     // analyzeContent,
-    // findBasedOnTarget,
+    findBasedOnTarget,
 };

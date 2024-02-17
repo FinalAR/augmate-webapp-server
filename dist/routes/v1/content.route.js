@@ -57,6 +57,14 @@ _router
 // auth,
 // permit([RoleType.ADMIN, RoleType.USER]),
 controllers_1.contentController.deleteContent);
+//FIND Content DETAILS BY TARGET phashID
+_router
+    .route('/find/:phashId')
+    .get(
+// validate([authorization()]),
+// auth,
+// permit([RoleType.ADMIN, RoleType.USER]),
+controllers_1.contentController.findBasedOnTarget);
 //EXPORT
 exports.router = _router;
 //# sourceMappingURL=content.route.js.map

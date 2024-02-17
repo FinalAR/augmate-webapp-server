@@ -74,5 +74,16 @@ _router
         // permit([RoleType.ADMIN, RoleType.USER]),
         contentController.deleteContent
     );
+
+
+//FIND Content DETAILS BY TARGET phashID
+_router
+    .route('/find/:phashId')
+    .get(
+        // validate([authorization()]),
+        // auth,
+        // permit([RoleType.ADMIN, RoleType.USER]),
+        contentController.findBasedOnTarget
+    );
 //EXPORT
 export const router = _router;
