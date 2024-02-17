@@ -5,7 +5,27 @@ import { IContent } from '../interfaces';
  * @openapi
  * components:
  *   schemas:
- *     Content:
+ *     Metadata:
+ *       type: object
+ *       required:
+ *        - total
+ *        - limit
+ *        - totalPages
+ *        - currentPage
+ *       properties:
+ *         total:
+ *           type: number
+ *           default: 8
+ *         limit:
+ *           type: number
+ *           default: 10
+ *         totalPages:
+ *           type: number
+ *           default: 1
+ *         currentPage:
+ *           type: number
+ *           default: 1
+ *     Contentdraft:
  *       type: object
  *       required:
  *        - title
@@ -25,11 +45,50 @@ import { IContent } from '../interfaces';
  *         image:
  *           type: string
  *           default: "https://i.imgur.com/QlRphfQ.jpg"
+ *     Content:
+ *       type: object
+ *       required:
+ *        - targetImage
+ *        - contentImage
+ *        - modelPath
+ *        - modeFile
+ *        - size
+ *       properties:
+ *         targetImage:
+ *           type: string 
+ *         contentImage:
+ *           type: string    
+ *         meshColor:
+ *           type: string
+ *           default: '0x0000ff'
+ *         modelPath:
+ *           type: string
+ *         modelFile:
+ *           type: string
+ *         progressPhase:
+ *           type: string
+ *           default: 'phase 2'    
+ *         positionY:
+ *           type: string
+ *           default: '0'
+ *         scaleSet:
+ *           type: string
+ *           default: '0.3'
+ *         size:
+ *           type: string
+ *           default: '11173332'
+ *         ref_ver:
+ *           type: number
+ *           default: 1
  *     ContentResponse:
  *       type: object
  *       properties:
  *         _id:
  *           type: string
+ *         targetImage:
+ *           type: string 
+ *         contentImage:
+ *           type: string 
  *         meshColor:
  *           type: string
  *           default: '0x0000ff'
@@ -61,27 +120,11 @@ import { IContent } from '../interfaces';
  *     ContentAllResponse:
  *       type: object
  *       properties:
- *         user:
- *           type: string
- *         _id:
- *           type: string
- *         title:
- *           type: string
- *         description:
- *           type: string
- *         price:
- *           type: number
- *         image:
- *           type: string
- *         productId:
- *           type: string
- *         createdAt:
- *           type: string
- *         updatedAt:
- *           type: string
- *         __v:
- *           type: number
- *
+ *         data:
+ *           type: array
+ *           items: ContentResponse
+ *         meta:
+ *           type: Metadata
  */
 
 //EXPORT INTERFACE WITH MONGOOSE DOCUMENT
@@ -90,6 +133,14 @@ export interface IContnetModel extends IContent, Document { }
 //DEFINE USER SCHEMA
 const ContentSchema: Schema = new Schema(
     {
+        targetImage: {
+            type: Buffer,
+            required: true,
+        },
+        contentImage: {
+            type: Buffer,
+            required: true,
+        },
         meshColor: {
             type: String,
             default: '0x0000ff',

@@ -29,14 +29,15 @@ const options: swaggerJsdoc.Options = {
     //   },
     // ],
   },
-  apis: ["./dist/routes/v1/*.js", "./dist/controllers/*.js", "./dist/models/*.js"],
+  apis: ["./src/routes/v1/*.ts", "./src/controllers/*.ts", "./src/models/*.ts"],
 };
 
 const swaggerSpec = swaggerJsdoc(options);
 
 function swaggerDocs(app: Express, port: number) {
   // Swagger page
-  app.use("/sawgger-docs-ext", swaggerUi.serve, swaggerUi.setup(swaggerSpec, { customCssUrl: CSS_URL }));
+  app.use("/sawgger-docs-ext", swaggerUi.serve, swaggerUi.setup(swaggerSpec, { customCss:
+    '.swagger-ui .opblock .opblock-summary-path-description-wrapper { align-items: center; display: flex; flex-wrap: wrap; gap: 0 10px; padding: 0 10px; width: 100%; }', customCssUrl: CSS_URL }));
 
   // Docs in JSON format
   app.get("/swag-docs-ext.json", (req: Request, res: Response) => {

@@ -26,6 +26,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importStar(require("mongoose"));
 //DEFINE USER SCHEMA
 const ContentSchema = new mongoose_1.Schema({
+    targetImage: {
+        type: Buffer,
+        required: true,
+    },
+    contentImage: {
+        type: Buffer,
+        required: true,
+    },
     meshColor: {
         type: String,
         default: '0x0000ff',

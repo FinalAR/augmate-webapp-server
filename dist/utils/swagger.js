@@ -30,12 +30,12 @@ const options = {
         //   },
         // ],
     },
-    apis: ["./dist/routes/v1/*.js", "./dist/controllers/*.js", "./dist/models/*.js"],
+    apis: ["./src/routes/v1/*.ts", "./src/controllers/*.ts", "./src/models/*.ts"],
 };
 const swaggerSpec = (0, swagger_jsdoc_1.default)(options);
 function swaggerDocs(app, port) {
     // Swagger page
-    app.use("/sawgger-docs-ext", swagger_ui_express_1.default.serve, swagger_ui_express_1.default.setup(swaggerSpec, { customCssUrl: CSS_URL }));
+    app.use("/sawgger-docs-ext", swagger_ui_express_1.default.serve, swagger_ui_express_1.default.setup(swaggerSpec, { customCss: '.swagger-ui .opblock .opblock-summary-path-description-wrapper { align-items: center; display: flex; flex-wrap: wrap; gap: 0 10px; padding: 0 10px; width: 100%; }', customCssUrl: CSS_URL }));
     // Docs in JSON format
     app.get("/swag-docs-ext.json", (req, res) => {
         res.setHeader("Content-Type", "application/json");

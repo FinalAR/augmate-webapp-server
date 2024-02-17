@@ -49,6 +49,14 @@ _router
 // auth,
 // permit([RoleType.ADMIN, RoleType.USER]),
 controllers_1.contentController.getAllContent);
+//DELETE Content DETAILS BY ID
+_router
+    .route('/delete/:contentId')
+    .delete(
+// validate([authorization()]),
+// auth,
+// permit([RoleType.ADMIN, RoleType.USER]),
+controllers_1.contentController.deleteContent);
 //EXPORT
 exports.router = _router;
 //# sourceMappingURL=content.route.js.map

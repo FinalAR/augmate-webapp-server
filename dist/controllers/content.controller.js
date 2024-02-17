@@ -16,27 +16,47 @@ const httpError_1 = __importDefault(require("../utils/httpError"));
 const general_1 = require("../utils/general");
 const Logging_1 = __importDefault(require("../library/Logging"));
 const content_1 = __importDefault(require("../models/content"));
+////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  * @openapi
  * /api/v1/content/create:
  *  post:
  *     tags:
  *     - Content
- *     description: Responds if the app is up and running
+ *     summary: Create a new Content
  *     responses:
  *       200:
- *         description: App is up and running
+ *         description: Content Details
+ *         content:
+ *          application/json:
+ *           schema:
+ *              $ref: '#/components/schemas/Content'
+ *           example:
+ *             "targetImage": "base64encoding"
+ *             "contentImage": "base64encoding"
+ *             "meshColor": "0x0000ff"
+ *             "imageTargetSrc": "https://finalar.github.io/imageTargets/target_datestamp_timestamp.mind"
+ *             "modelPath": "https://finalar.github.io/models/SurveySet/"
+ *             "modelFile": "mode_dateStamp_timeStamp.glb"
+ *             "positionY": "0"
+ *             "scaleSet": "0.3"
+ *             "size": "11173332"
+ *             "ref_ver": 1
  */
 //CREATE A CONTENT
 const createContent = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { imageTargetSrc, modelPath, modelFile, positionY, scaleSet, size } = req.body;
+        const { targetImage, contentImage, imageTargetSrc, modelPath, modelFile, positionY, scaleSet, size } = req.body;
         Logging_1.default.debug(`Request Body = ${req.body}`);
         //function generate analytix matrix
         //analyzeContent()
+        const targetImageBinary = Buffer.from(targetImage, 'base64');
+        const contentImageBinary = Buffer.from(contentImage, 'base64');
         const currentTimestamp = new Date().toISOString();
         //CRETA NEW USRE
         let contentData = new content_1.default({
+            targetImage: targetImageBinary,
+            contentImage: contentImageBinary,
             imageTargetSrc,
             modelPath,
             modelFile,
@@ -56,33 +76,33 @@ const createContent = (req, res, next) => __awaiter(void 0, void 0, void 0, func
         next(error);
     }
 });
-//GET CONTENT DETAILS BY ID
-const getContent = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const contentId = req.params.contentId;
-        let data = yield content_1.default.findById(contentId);
-        return (0, general_1.jsonOne)(res, 200, data);
-    }
-    catch (error) {
-        next(error);
-    }
-});
+////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  * @openapi
- * '/api/v1/content/fetch':
+ * '/api/v1/content/fetch/{contentId}':
  *  get:
  *     tags:
  *     - Content
- *     summary: Fetch All Contents
+ *     summary: Fetch Contents by Id
+ *     parameters:
+ *       - in: path
+ *         name: contentId
+ *         required: true
+ *         description: ID of the content to fetch
+ *         schema:
+ *           type: string
+ *           example: 65cafd1a91f0f81fbfd1d499
  *     responses:
  *       200:
- *         description: Product List
+ *         description: Content Details
  *         content:
  *          application/json:
  *           schema:
  *              $ref: '#/components/schemas/ContentResponse'
  *           example:
  *             "_id": "65cafd1a91f0f81fbfd1d499"
+ *             "targetImage": "base64encoding"
+ *             "contentImage": "base64encoding"
  *             "meshColor": "0x0000ff"
  *             "imageTargetSrc": "https://finalar.github.io/imageTargets/targets2.mind"
  *             "modelPath": "https://finalar.github.io/models/SurveySet/"
@@ -97,6 +117,55 @@ const getContent = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
  *             "createdAt": "2024-02-13T05:24:42.484Z"
  *             "updatedAt": "2024-02-13T05:24:42.484Z"
  *             "__v": 0
+ */
+//GET CONTENT DETAILS BY ID
+const getContent = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const contentId = req.params.contentId;
+        let data = yield content_1.default.findById(contentId);
+        return (0, general_1.jsonOne)(res, 200, data);
+    }
+    catch (error) {
+        next(error);
+    }
+});
+////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * @openapi
+ * '/api/v1/content/fetch':
+ *  get:
+ *     tags:
+ *     - Content
+ *     summary: Fetch All Contents
+ *     responses:
+ *       200:
+ *         description: Content List
+ *         content:
+ *          application/json:
+ *           schema:
+ *              $ref: '#/components/schemas/ContentAllResponse'
+ *           example:
+ *             data:
+ *               - "_id": "65cafd1a91f0f81fbfd1d499"
+ *                 meshColor: "0x0000ff"
+ *                 "imageTargetSrc": "https://finalar.github.io/imageTargets/targets2.mind"
+ *                 "modelPath": "https://finalar.github.io/models/SurveySet/"
+ *                 "modelFile": "FoodPackDDFGH.glb"
+ *                 "progressPhase": "phase 2"
+ *                 "positionY": "0"
+ *                 "scaleSet": "0.3"
+ *                 "size": "11173332"
+ *                 "createdDate": "2000-01-12T08:30:00.000Z"
+ *                 "lastUpdatedDate": "2000-01-12T08:30:00.000Z"
+ *                 "ref_ver": 1
+ *                 "createdAt": "2024-02-13T05:24:42.484Z"
+ *                 "updatedAt": "2024-02-13T05:24:42.484Z"
+ *                 "__v": 0
+ *             meta:
+ *               total: 8
+ *               limit: 10
+ *               totalPages: 1
+ *               currentPage: 1
  */
 //GET ALL CONTENT LIST
 const getAllContent = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
@@ -128,6 +197,41 @@ const getAllContent = (req, res, next) => __awaiter(void 0, void 0, void 0, func
         next(error);
     }
 });
+////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * @openapi
+ * /api/v1/content/{contentId}:
+ *  put:
+  *     tags:
+ *     - Content
+ *     summary: Update Contents by Id
+ *     parameters:
+ *       - in: path
+ *         name: contentId
+ *         required: true
+ *         description: ID of the content to update
+ *         schema:
+ *           type: string
+ *           example: 65cafd1a91f0f81fbfd1d499
+ *     responses:
+ *       200:
+ *         description: Content Details
+ *         content:
+ *          application/json:
+ *           schema:
+ *              $ref: '#/components/schemas/Content'
+ *           example:
+ *             "targetImage": "base64encoding"
+ *             "contentImage": "base64encoding"
+ *             "meshColor": "0x0000ff"
+ *             "imageTargetSrc": "https://finalar.github.io/imageTargets/target_datestamp_timestamp.mind"
+ *             "modelPath": "https://finalar.github.io/models/SurveySet/"
+ *             "modelFile": "mode_dateStamp_timeStamp.glb"
+ *             "positionY": "0"
+ *             "scaleSet": "0.3"
+ *             "size": "11173332"
+ *             "ref_ver": 1
+ */
 //UPDATE CONTENT DETAILS WITH ID
 const updateContent = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -157,6 +261,34 @@ const updateContent = (req, res, next) => __awaiter(void 0, void 0, void 0, func
         next(error);
     }
 });
+////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * @openapi
+ * /api/v1/content/{contentId}:
+ *  delete:
+  *     tags:
+ *     - Content
+ *     summary: Delete Contents by Id
+ *     parameters:
+ *       - in: path
+ *         name: contentId
+ *         required: true
+ *         description: ID of the content to delete
+ *         schema:
+ *           type: string
+ *           example: 65cafd1a91f0f81fbfd1d555
+ *     responses:
+ *       200:
+ *         description: Content deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Content deleted successfully
+ */
 //DELETE CONTENT DETAILS WITH ID
 const deleteContent = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -172,7 +304,7 @@ const deleteContent = (req, res, next) => __awaiter(void 0, void 0, void 0, func
             });
         }
         yield content_1.default.findByIdAndDelete(contentId);
-        return (0, general_1.jsonOne)(res, 200, { message: 'Content deleted successfully' });
+        return (0, general_1.jsonOne)(res, 200, { message: 'Content deleted successfully...!' });
     }
     catch (error) {
         next(error);

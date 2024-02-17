@@ -64,5 +64,15 @@ _router
         contentController.getAllContent
     );
 
+
+//DELETE Content DETAILS BY ID
+_router
+    .route('/delete/:contentId')
+    .delete(
+        // validate([authorization()]),
+        // auth,
+        // permit([RoleType.ADMIN, RoleType.USER]),
+        contentController.deleteContent
+    );
 //EXPORT
 export const router = _router;
