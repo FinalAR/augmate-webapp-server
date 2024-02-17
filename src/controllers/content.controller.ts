@@ -6,32 +6,32 @@ import Content, { IContnetModel } from '../models/content';
 import { IQualityObj } from '../interfaces/contentQuality';
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
-  /**
-   * @openapi
-   * /api/v1/content/create:
-   *  post:
-   *     tags:
-   *     - Content
-   *     summary: Create a new Content
-   *     responses:
-   *       200:
-   *         description: Content Details
-   *         content:
-   *          application/json:
-   *           schema:
-   *              $ref: '#/components/schemas/Content'
-   *           example:
-   *             "targetImage": "base64encoding"
-   *             "contentImage": "base64encoding"
-   *             "meshColor": "0x0000ff"
-   *             "imageTargetSrc": "https://finalar.github.io/imageTargets/target_datestamp_timestamp.mind"
-   *             "modelPath": "https://finalar.github.io/models/SurveySet/"
-   *             "modelFile": "mode_dateStamp_timeStamp.glb"
-   *             "positionY": "0"
-   *             "scaleSet": "0.3"
-   *             "size": "11173332"
-   *             "ref_ver": 1
-   */
+/**
+ * @openapi
+ * /api/v1/content/create:
+ *  post:
+ *     tags:
+ *     - Content
+ *     summary: Create a new Content
+ *     responses:
+ *       200:
+ *         description: Content Details
+ *         content:
+ *          application/json:
+ *           schema:
+ *              $ref: '#/components/schemas/Content'
+ *           example:
+ *             "targetImage": "base64encoding"
+ *             "contentImage": "base64encoding"
+ *             "meshColor": "0x0000ff"
+ *             "imageTargetSrc": "https://finalar.github.io/imageTargets/target_datestamp_timestamp.mind"
+ *             "modelPath": "https://finalar.github.io/models/SurveySet/"
+ *             "modelFile": "mode_dateStamp_timeStamp.glb"
+ *             "positionY": "0"
+ *             "scaleSet": "0.3"
+ *             "size": "11173332"
+ *             "ref_ver": 1
+ */
 
 //CREATE A CONTENT
 const createContent = async (req: Request, res: Response, next: NextFunction) => {
@@ -75,54 +75,77 @@ const createContent = async (req: Request, res: Response, next: NextFunction) =>
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
 
-  /**
-   * @openapi
-   * '/api/v1/content/fetch/{contentId}':
-   *  get:
-   *     tags:
-   *     - Content
-   *     summary: Fetch Contents by Id
-   *     parameters:
-   *       - in: path
-   *         name: contentId
-   *         required: true
-   *         description: ID of the content to fetch
-   *         schema:
-   *           type: string
-   *           example: 65cafd1a91f0f81fbfd1d499
-   *     responses:
-   *       200:
-   *         description: Content Details
-   *         content:
-   *          application/json:
-   *           schema:
-   *              $ref: '#/components/schemas/ContentResponse'
-   *           example:
-   *             "_id": "65cafd1a91f0f81fbfd1d499"
-   *             "targetImage": "base64encoding"
-   *             "contentImage": "base64encoding"
-   *             "meshColor": "0x0000ff"
-   *             "imageTargetSrc": "https://finalar.github.io/imageTargets/targets2.mind"
-   *             "modelPath": "https://finalar.github.io/models/SurveySet/"
-   *             "modelFile": "FoodPackDDFGH.glb"
-   *             "progressPhase": "phase 2"
-   *             "positionY": "0"
-   *             "scaleSet": "0.3"
-   *             "size": "11173332"
-   *             "createdDate": "2000-01-12T08:30:00.000Z"
-   *             "lastUpdatedDate": "2000-01-12T08:30:00.000Z"
-   *             "ref_ver": 1
-   *             "createdAt": "2024-02-13T05:24:42.484Z"
-   *             "updatedAt": "2024-02-13T05:24:42.484Z"
-   *             "__v": 0
-   */
+/**
+ * @openapi
+ * '/api/v1/content/fetch/{contentId}':
+ *  get:
+ *     tags:
+ *     - Content
+ *     summary: Fetch Contents by Id
+ *     parameters:
+ *       - in: path
+ *         name: contentId
+ *         required: true
+ *         description: ID of the content to fetch
+ *         schema:
+ *           type: string
+ *           example: 65cafd1a91f0f81fbfd1d499
+ *     responses:
+ *       200:
+ *         description: Content Details
+ *         content:
+ *          application/json:
+ *           schema:
+ *              $ref: '#/components/schemas/ContentResponse'
+ *           example:
+ *             "_id": "65cafd1a91f0f81fbfd1d499"
+ *             "targetImage": "base64encoding"
+ *             "contentImage": "base64encoding"
+ *             "meshColor": "0x0000ff"
+ *             "imageTargetSrc": "https://finalar.github.io/imageTargets/targets2.mind"
+ *             "modelPath": "https://finalar.github.io/models/SurveySet/"
+ *             "modelFile": "FoodPackDDFGH.glb"
+ *             "progressPhase": "phase 2"
+ *             "positionY": "0"
+ *             "scaleSet": "0.3"
+ *             "size": "11173332"
+ *             "createdDate": "2000-01-12T08:30:00.000Z"
+ *             "lastUpdatedDate": "2000-01-12T08:30:00.000Z"
+ *             "ref_ver": 1
+ *             "createdAt": "2024-02-13T05:24:42.484Z"
+ *             "updatedAt": "2024-02-13T05:24:42.484Z"
+ *             "__v": 0
+ */
 
 //GET CONTENT DETAILS BY ID
 const getContent = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const contentId = req.params.contentId;
 
-        let data = await Content.findById(contentId);
+        // Fetch the content document from the database
+        let content = await Content.findById(contentId);
+
+        // If content is not found, return a 404 response
+        if (!content) {
+            return res.status(404).json({ message: 'Content not found' });
+        }
+
+        // Extract targetImage and contentImage from the content document
+        const { targetImage, contentImage, ...responseData } = content.toObject();
+
+        const targetImageBuffer = Buffer.from(targetImage, 'binary');
+        const contentImageBuffer = Buffer.from(contentImage, 'binary');
+
+        // Convert binary data to base64 encoding
+        const targetImageBase64 = targetImageBuffer.toString('base64');
+        const contentImageBase64 = contentImageBuffer.toString('base64');
+
+        // Create a response object including targetImage and contentImage
+        const data = {
+            ...responseData,
+            targetImage: targetImageBase64 || '', // If targetImage is null or undefined, set it to an empty string
+            contentImage: contentImageBase64 || '', // If contentImage is null or undefined, set it to an empty string
+        };
 
         return jsonOne(res, 200, data);
     } catch (error) {
@@ -131,43 +154,45 @@ const getContent = async (req: Request, res: Response, next: NextFunction) => {
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
-  /**
-   * @openapi
-   * '/api/v1/content/fetch':
-   *  get:
-   *     tags:
-   *     - Content
-   *     summary: Fetch All Contents
-   *     responses:
-   *       200:
-   *         description: Content List
-   *         content:
-   *          application/json:
-   *           schema:
-   *              $ref: '#/components/schemas/ContentAllResponse'
-   *           example:
-   *             data:
-   *               - "_id": "65cafd1a91f0f81fbfd1d499"
-   *                 meshColor: "0x0000ff"
-   *                 "imageTargetSrc": "https://finalar.github.io/imageTargets/targets2.mind"
-   *                 "modelPath": "https://finalar.github.io/models/SurveySet/"
-   *                 "modelFile": "FoodPackDDFGH.glb"
-   *                 "progressPhase": "phase 2"
-   *                 "positionY": "0"
-   *                 "scaleSet": "0.3"
-   *                 "size": "11173332"
-   *                 "createdDate": "2000-01-12T08:30:00.000Z"
-   *                 "lastUpdatedDate": "2000-01-12T08:30:00.000Z"
-   *                 "ref_ver": 1
-   *                 "createdAt": "2024-02-13T05:24:42.484Z"
-   *                 "updatedAt": "2024-02-13T05:24:42.484Z"
-   *                 "__v": 0
-   *             meta:
-   *               total: 8
-   *               limit: 10
-   *               totalPages: 1
-   *               currentPage: 1
-   */
+/**
+ * @openapi
+ * '/api/v1/content/fetch':
+ *  get:
+ *     tags:
+ *     - Content
+ *     summary: Fetch All Contents
+ *     responses:
+ *       200:
+ *         description: Content List
+ *         content:
+ *          application/json:
+ *           schema:
+ *              $ref: '#/components/schemas/ContentAllResponse'
+ *           example:
+ *             data:
+ *               - "_id": "65cafd1a91f0f81fbfd1d499"
+ *                 "targetImage": "base64encoding"
+ *                 "contentImage": "base64encoding"
+ *                 "meshColor": "0x0000ff"
+ *                 "imageTargetSrc": "https://finalar.github.io/imageTargets/targets2.mind"
+ *                 "modelPath": "https://finalar.github.io/models/SurveySet/"
+ *                 "modelFile": "FoodPackDDFGH.glb"
+ *                 "progressPhase": "phase 2"
+ *                 "positionY": "0"
+ *                 "scaleSet": "0.3"
+ *                 "size": "11173332"
+ *                 "createdDate": "2000-01-12T08:30:00.000Z"
+ *                 "lastUpdatedDate": "2000-01-12T08:30:00.000Z"
+ *                 "ref_ver": 1
+ *                 "createdAt": "2024-02-13T05:24:42.484Z"
+ *                 "updatedAt": "2024-02-13T05:24:42.484Z"
+ *                 "__v": 0
+ *             meta:
+ *               total: 8
+ *               limit: 10
+ *               totalPages: 1
+ *               currentPage: 1
+ */
 
 //GET ALL CONTENT LIST
 const getAllContent = async (req: Request, res: Response, next: NextFunction) => {
@@ -190,6 +215,30 @@ const getAllContent = async (req: Request, res: Response, next: NextFunction) =>
 
         Logging.debug(`First Query = ${contents}`);
 
+          // Convert binary data to base64 encoding for each content document
+          const dataWithImages = await Promise.all(contents.map(async (content) => {
+            const { targetImage, contentImage, ...responseData } = content.toObject();
+            
+            let targetImageBase64 = '';
+            if (targetImage) {
+                const targetImageBuffer = Buffer.from(targetImage, 'binary');
+                targetImageBase64 = targetImageBuffer.toString('base64');
+            }
+
+            let contentImageBase64 = '';
+            if (contentImage) {
+                const contentImageBuffer = Buffer.from(contentImage, 'binary');
+                contentImageBase64 = contentImageBuffer.toString('base64');
+            }
+
+            return {
+                ...responseData,
+                targetImage: targetImageBase64,
+                contentImage: contentImageBase64,
+            };
+        }));
+
+
         //CREATE PAGINATION
         const meta = {
             total: count,
@@ -198,7 +247,7 @@ const getAllContent = async (req: Request, res: Response, next: NextFunction) =>
             currentPage: pageOptions.page,
         };
 
-        return jsonAll<any>(res, 200, contents, meta);
+        return jsonAll<any>(res, 200, dataWithImages, meta);
     } catch (error) {
         Logging.error(`Error fetching content: ${error}`);
         next(error);
@@ -206,40 +255,40 @@ const getAllContent = async (req: Request, res: Response, next: NextFunction) =>
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
-  /**
-   * @openapi
-   * /api/v1/content/{contentId}:
-   *  put:
-    *     tags:
-   *     - Content
-   *     summary: Update Contents by Id
-   *     parameters:
-   *       - in: path
-   *         name: contentId
-   *         required: true
-   *         description: ID of the content to update
-   *         schema:
-   *           type: string
-   *           example: 65cafd1a91f0f81fbfd1d499
-   *     responses:
-   *       200:
-   *         description: Content Details
-   *         content:
-   *          application/json:
-   *           schema:
-   *              $ref: '#/components/schemas/Content'
-   *           example:
-   *             "targetImage": "base64encoding"
-   *             "contentImage": "base64encoding"
-   *             "meshColor": "0x0000ff"
-   *             "imageTargetSrc": "https://finalar.github.io/imageTargets/target_datestamp_timestamp.mind"
-   *             "modelPath": "https://finalar.github.io/models/SurveySet/"
-   *             "modelFile": "mode_dateStamp_timeStamp.glb"
-   *             "positionY": "0"
-   *             "scaleSet": "0.3"
-   *             "size": "11173332"
-   *             "ref_ver": 1
-   */
+/**
+ * @openapi
+ * /api/v1/content/{contentId}:
+ *  put:
+  *     tags:
+ *     - Content
+ *     summary: Update Contents by Id
+ *     parameters:
+ *       - in: path
+ *         name: contentId
+ *         required: true
+ *         description: ID of the content to update
+ *         schema:
+ *           type: string
+ *           example: 65cafd1a91f0f81fbfd1d499
+ *     responses:
+ *       200:
+ *         description: Content Details
+ *         content:
+ *          application/json:
+ *           schema:
+ *              $ref: '#/components/schemas/Content'
+ *           example:
+ *             "targetImage": "base64encoding"
+ *             "contentImage": "base64encoding"
+ *             "meshColor": "0x0000ff"
+ *             "imageTargetSrc": "https://finalar.github.io/imageTargets/target_datestamp_timestamp.mind"
+ *             "modelPath": "https://finalar.github.io/models/SurveySet/"
+ *             "modelFile": "mode_dateStamp_timeStamp.glb"
+ *             "positionY": "0"
+ *             "scaleSet": "0.3"
+ *             "size": "11173332"
+ *             "ref_ver": 1
+ */
 
 //UPDATE CONTENT DETAILS WITH ID
 const updateContent = async (req: Request, res: Response, next: NextFunction) => {
@@ -257,9 +306,14 @@ const updateContent = async (req: Request, res: Response, next: NextFunction) =>
             });
         }
 
+        const targetImageBinary = Buffer.from(body.targetImage, 'base64');
+        const contentImageBinary = Buffer.from(body.contentImage, 'base64');
+
         let savedContent = await Content.findOneAndUpdate(
             { _id: contentId },
             {
+                targetImage: targetImageBinary,
+                contentImage: contentImageBinary,
                 imageTargetSrc: body.imageTargetSrc,
                 modelPath: body.modelPath,
                 modelFile: body.modelFile,
@@ -277,33 +331,33 @@ const updateContent = async (req: Request, res: Response, next: NextFunction) =>
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
-  /**
-   * @openapi
-   * /api/v1/content/{contentId}:
-   *  delete:
-    *     tags:
-   *     - Content
-   *     summary: Delete Contents by Id
-   *     parameters:
-   *       - in: path
-   *         name: contentId
-   *         required: true
-   *         description: ID of the content to delete
-   *         schema:
-   *           type: string
-   *           example: 65cafd1a91f0f81fbfd1d555
-   *     responses:
-   *       200:
-   *         description: Content deleted successfully
-   *         content:
-   *           application/json:
-   *             schema:
-   *               type: object
-   *               properties:
-   *                 message:
-   *                   type: string
-   *                   example: Content deleted successfully       
-   */
+/**
+ * @openapi
+ * /api/v1/content/{contentId}:
+ *  delete:
+  *     tags:
+ *     - Content
+ *     summary: Delete Contents by Id
+ *     parameters:
+ *       - in: path
+ *         name: contentId
+ *         required: true
+ *         description: ID of the content to delete
+ *         schema:
+ *           type: string
+ *           example: 65cafd1a91f0f81fbfd1d555
+ *     responses:
+ *       200:
+ *         description: Content deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Content deleted successfully       
+ */
 
 //DELETE CONTENT DETAILS WITH ID
 const deleteContent = async (req: Request, res: Response, next: NextFunction) => {

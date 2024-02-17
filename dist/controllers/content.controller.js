@@ -8,6 +8,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __rest = (this && this.__rest) || function (s, e) {
+    var t = {};
+    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+        t[p] = s[p];
+    if (s != null && typeof Object.getOwnPropertySymbols === "function")
+        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
+            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
+                t[p[i]] = s[p[i]];
+        }
+    return t;
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -122,7 +133,21 @@ const createContent = (req, res, next) => __awaiter(void 0, void 0, void 0, func
 const getContent = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const contentId = req.params.contentId;
-        let data = yield content_1.default.findById(contentId);
+        // Fetch the content document from the database
+        let content = yield content_1.default.findById(contentId);
+        // If content is not found, return a 404 response
+        if (!content) {
+            return res.status(404).json({ message: 'Content not found' });
+        }
+        // Extract targetImage and contentImage from the content document
+        const _a = content.toObject(), { targetImage, contentImage } = _a, responseData = __rest(_a, ["targetImage", "contentImage"]);
+        const targetImageBuffer = Buffer.from(targetImage, 'binary');
+        const contentImageBuffer = Buffer.from(contentImage, 'binary');
+        // Convert binary data to base64 encoding
+        const targetImageBase64 = targetImageBuffer.toString('base64');
+        const contentImageBase64 = contentImageBuffer.toString('base64');
+        // Create a response object including targetImage and contentImage
+        const data = Object.assign(Object.assign({}, responseData), { targetImage: targetImageBase64 || '', contentImage: contentImageBase64 || '' });
         return (0, general_1.jsonOne)(res, 200, data);
     }
     catch (error) {
@@ -147,7 +172,9 @@ const getContent = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
  *           example:
  *             data:
  *               - "_id": "65cafd1a91f0f81fbfd1d499"
- *                 meshColor: "0x0000ff"
+ *                 "targetImage": "base64encoding"
+ *                 "contentImage": "base64encoding"
+ *                 "meshColor": "0x0000ff"
  *                 "imageTargetSrc": "https://finalar.github.io/imageTargets/targets2.mind"
  *                 "modelPath": "https://finalar.github.io/models/SurveySet/"
  *                 "modelFile": "FoodPackDDFGH.glb"
@@ -183,6 +210,21 @@ const getAllContent = (req, res, next) => __awaiter(void 0, void 0, void 0, func
             .skip((pageOptions.page - 1) * pageOptions.limit)
             .sort({ createdAt: -1 });
         Logging_1.default.debug(`First Query = ${contents}`);
+        // Convert binary data to base64 encoding for each content document
+        const dataWithImages = yield Promise.all(contents.map((content) => __awaiter(void 0, void 0, void 0, function* () {
+            const _b = content.toObject(), { targetImage, contentImage } = _b, responseData = __rest(_b, ["targetImage", "contentImage"]);
+            let targetImageBase64 = '';
+            if (targetImage) {
+                const targetImageBuffer = Buffer.from(targetImage, 'binary');
+                targetImageBase64 = targetImageBuffer.toString('base64');
+            }
+            let contentImageBase64 = '';
+            if (contentImage) {
+                const contentImageBuffer = Buffer.from(contentImage, 'binary');
+                contentImageBase64 = contentImageBuffer.toString('base64');
+            }
+            return Object.assign(Object.assign({}, responseData), { targetImage: targetImageBase64, contentImage: contentImageBase64 });
+        })));
         //CREATE PAGINATION
         const meta = {
             total: count,
@@ -190,7 +232,7 @@ const getAllContent = (req, res, next) => __awaiter(void 0, void 0, void 0, func
             totalPages: Math.ceil(count / pageOptions.limit),
             currentPage: pageOptions.page,
         };
-        return (0, general_1.jsonAll)(res, 200, contents, meta);
+        return (0, general_1.jsonAll)(res, 200, dataWithImages, meta);
     }
     catch (error) {
         Logging_1.default.error(`Error fetching content: ${error}`);
@@ -246,7 +288,11 @@ const updateContent = (req, res, next) => __awaiter(void 0, void 0, void 0, func
                 code: 400,
             });
         }
+        const targetImageBinary = Buffer.from(body.targetImage, 'base64');
+        const contentImageBinary = Buffer.from(body.contentImage, 'base64');
         let savedContent = yield content_1.default.findOneAndUpdate({ _id: contentId }, {
+            targetImage: targetImageBinary,
+            contentImage: contentImageBinary,
             imageTargetSrc: body.imageTargetSrc,
             modelPath: body.modelPath,
             modelFile: body.modelFile,
