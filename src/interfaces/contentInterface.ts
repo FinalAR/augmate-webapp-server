@@ -1,4 +1,5 @@
 export interface IContent {
+    targetImageHash: string;
     targetImage: string; // Base64 encoded string
     contentImage: string; // Base64 encoded string
     meshColor: string;

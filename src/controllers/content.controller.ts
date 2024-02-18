@@ -21,6 +21,7 @@ import { IQualityObj } from '../interfaces/contentQuality';
  *           schema:
  *              $ref: '#/components/schemas/Content'
  *           example:
+ *             "targetImageHash": "pHashedValue"
  *             "targetImage": "base64encoding"
  *             "contentImage": "base64encoding"
  *             "meshColor": "0x0000ff"
@@ -36,7 +37,7 @@ import { IQualityObj } from '../interfaces/contentQuality';
 //CREATE A CONTENT
 const createContent = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const { targetImage, contentImage, imageTargetSrc, modelPath, modelFile, positionY, scaleSet, size } = req.body;
+        const { targetImageHash, targetImage, contentImage, imageTargetSrc, modelPath, modelFile, positionY, scaleSet, size } = req.body;
 
 
         Logging.debug(`Request Body = ${req.body}`);
@@ -50,6 +51,7 @@ const createContent = async (req: Request, res: Response, next: NextFunction) =>
         const currentTimestamp = new Date().toISOString();
         //CRETA NEW USRE
         let contentData = new Content({
+            targetImageHash,
             targetImage: targetImageBinary,
             contentImage: contentImageBinary,
             imageTargetSrc,
@@ -409,6 +411,7 @@ const deleteContent = async (req: Request, res: Response, next: NextFunction) =>
  *           schema:
  *              $ref: '#/components/schemas/ExperienceContent'
  *           example:
+ *             "successOrFaliure": "Y"
  *             "meshColor": "0x0000ff"
  *             "imageTargetSrc": "https://finalar.github.io/imageTargets/targets2.mind"
  *             "modelPath": "https://finalar.github.io/models/SurveySet/"
@@ -423,31 +426,45 @@ const deleteContent = async (req: Request, res: Response, next: NextFunction) =>
 //FIND CONTENT DETAILS BY HASH
 const findBasedOnTarget = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const hashId = req.params.phashId;
+        const phashId = req.params.phashId;
+        const maxHammingDistance = 5; // Set your desired maximum Hamming distance here
 
-        // Fetch the specific content document from the database
-        let content = await Content.findById(hashId);
+        // Fetch all content documents from the database
+        let contents = await Content.find();
 
-        // If content is not found, return a 404 response
-        if (!content) {
-            return res.status(404).json({ message: 'Content not found' });
+        // Filter documents based on the Hamming distance
+        let similarContents = contents.filter(content => {
+            const currentHash = content.targetImageHash;
+            const hammingDistance = calculateHammingDistance(phashId, currentHash);
+            return hammingDistance <= maxHammingDistance;
+        });
+
+        // If no similar content found, return a 404 response
+        if (similarContents.length === 0) {
+            return res.status(404).json({ successOrFaliure: 'N', message: 'No similar content found' });
         }
 
-        
-        // Extract required data for AR experience from the content document
-        const { meshColor, imageTargetSrc, modelPath, modelFile, progressPhase, positionY, scaleSet, size }= content.toObject();
+        // Sort similar contents based on Hamming distance
+        similarContents.sort((a, b) => {
+            const hammingDistanceA = calculateHammingDistance(phashId, a.targetImageHash);
+            const hammingDistanceB = calculateHammingDistance(phashId, b.targetImageHash);
+            return hammingDistanceA - hammingDistanceB;
+        });
 
+        // Extract required data for AR experience from the most similar content document
+        const { meshColor, imageTargetSrc, modelPath, modelFile, progressPhase, positionY, scaleSet, size } = similarContents[0].toObject();
 
         // Create a response object including targetImage and contentImage
         const data = {
-            meshColor: meshColor, 
-            imageTargetSrc: imageTargetSrc, 
-            modelPath: modelPath,
-            modelFile: modelFile,
-            progressPhase: progressPhase,
-            positionY: positionY,
-            scaleSet: scaleSet,
-            size: size,
+            successOrFaliure: 'Y',
+            meshColor,
+            imageTargetSrc,
+            modelPath,
+            modelFile,
+            progressPhase,
+            positionY,
+            scaleSet,
+            size,
         };
 
         return jsonOne(res, 200, data);
@@ -455,6 +472,66 @@ const findBasedOnTarget = async (req: Request, res: Response, next: NextFunction
         next(error);
     }
 };
+
+// Function to calculate Hamming distance between two hexadecimal strings
+function calculateHammingDistance(hash1: string, hash2: string): number {
+    let distance = 0;
+    const length = Math.min(hash1.length, hash2.length);
+    for (let i = 0; i < length; i++) {
+        if (hash1[i] !== hash2[i]) {
+            distance++;
+        }
+    }
+    return distance;
+}
+
+
+// const findBasedOnTarget = async (req: Request, res: Response, next: NextFunction) => {
+//     try {
+//         const phashId = req.params.phashId;
+
+//         // Fetch the specific content document from the database
+//         //let content = await Content.findById(phashId);
+//         const hammingDistance = Number(req.query.hammingDistance) || 400;
+
+//         //After finalizing the hamming distance use this
+//         // const hammingDistance = 200;
+
+//         // Find documents with targetImageHash within the specified hamming distance
+//         const content = await Content.find({
+//             targetImageHash: {
+//                 $regex: `^${phashId.slice(0, phashId.length - hammingDistance)}`,
+//             },
+//         });
+
+//         // If content is not found, return a 404 response
+//         if (!content) {
+//             return res.status(404).json({ successOrFaliure: 'N', message: 'Content not found' });
+//         }
+
+        
+//         // Extract required data for AR experience from the content document
+//         const { meshColor, imageTargetSrc, modelPath, modelFile, progressPhase, positionY, scaleSet, size }= content.toObject();
+
+
+//         // Create a response object including targetImage and contentImage
+//         const data = {
+//             successOrFaliure: 'Y',
+//             meshColor: meshColor, 
+//             imageTargetSrc: imageTargetSrc, 
+//             modelPath: modelPath,
+//             modelFile: modelFile,
+//             progressPhase: progressPhase,
+//             positionY: positionY,
+//             scaleSet: scaleSet,
+//             size: size,
+//         };
+
+//         return jsonOne(res, 200, data);
+//     } catch (error) {
+//         next(error);
+//     }
+// };
 
 // ANALYZE CONTENT function
 function analyzeContent(levels: number, obj: IQualityObj): string {

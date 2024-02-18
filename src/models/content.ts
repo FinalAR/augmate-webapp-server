@@ -48,12 +48,15 @@ import { IContent } from '../interfaces';
  *     Content:
  *       type: object
  *       required:
+ *        - targetImageHash
  *        - targetImage
  *        - contentImage
  *        - modelPath
  *        - modeFile
  *        - size
  *       properties:
+*         targetImageHash:
+ *           type: string 
  *         targetImage:
  *           type: string 
  *         contentImage:
@@ -83,6 +86,8 @@ import { IContent } from '../interfaces';
  *     ExperienceContent:
  *       type: object
  *       properties:
+ *         successOrFaliure:
+ *           type: string
  *         meshColor:
  *           type: string
  *           default: '0x0000ff'
@@ -158,6 +163,10 @@ export interface IContnetModel extends IContent, Document { }
 //DEFINE USER SCHEMA
 const ContentSchema: Schema = new Schema(
     {
+        targetImageHash: {
+            type: String,
+            required: true,
+        },
         targetImage: {
             type: Buffer,
             required: true,
