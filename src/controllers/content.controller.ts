@@ -49,7 +49,7 @@ const createContent = async (req: Request, res: Response, next: NextFunction) =>
         const contentImageBinary = Buffer.from(contentImage, 'base64');
 
         const currentTimestamp = new Date().toISOString();
-        //CRETA NEW USRE
+        //CRETA NEW CONTENT MAPPING
         let contentData = new Content({
             targetImageHash,
             targetImage: targetImageBinary,
@@ -64,6 +64,7 @@ const createContent = async (req: Request, res: Response, next: NextFunction) =>
             // createdDate: currentTimestamp,
             // lastUpdatedDate: currentTimestamp,
             ref_ver: 1,
+            flag:true
         });
 
         let savedContent = await contentData.save();
@@ -132,24 +133,27 @@ const getContent = async (req: Request, res: Response, next: NextFunction) => {
             return res.status(404).json({ message: 'Content not found' });
         }
 
-        // Extract targetImage and contentImage from the content document
-        const { targetImage, contentImage, ...responseData } = content.toObject();
+        
+        Logging.debug(`Query Results = ${content}`);
+        
+        // // Extract targetImage and contentImage from the content document
+        // const { targetImage, contentImage, ...responseData } = content.toObject();
 
-        const targetImageBuffer = Buffer.from(targetImage, 'binary');
-        const contentImageBuffer = Buffer.from(contentImage, 'binary');
+        // const targetImageBuffer = Buffer.from(targetImage, 'binary');
+        // const contentImageBuffer = Buffer.from(contentImage, 'binary');
 
-        // Convert binary data to base64 encoding
-        const targetImageBase64 = targetImageBuffer.toString('base64');
-        const contentImageBase64 = contentImageBuffer.toString('base64');
+        // // Convert binary data to base64 encoding
+        // const targetImageBase64 = targetImageBuffer.toString('base64');
+        // const contentImageBase64 = contentImageBuffer.toString('base64');
 
-        // Create a response object including targetImage and contentImage
-        const data = {
-            ...responseData,
-            targetImage: targetImageBase64 || '', // If targetImage is null or undefined, set it to an empty string
-            contentImage: contentImageBase64 || '', // If contentImage is null or undefined, set it to an empty string
-        };
+        // // Create a response object including targetImage and contentImage
+        // const data = {
+        //     ...responseData,
+        //     targetImage: targetImageBase64 || '', // If targetImage is null or undefined, set it to an empty string
+        //     contentImage: contentImageBase64 || '', // If contentImage is null or undefined, set it to an empty string
+        // };
 
-        return jsonOne(res, 200, data);
+        return jsonOne(res, 200, content);
     } catch (error) {
         next(error);
     }
@@ -217,28 +221,28 @@ const getAllContent = async (req: Request, res: Response, next: NextFunction) =>
 
         Logging.debug(`First Query = ${contents}`);
 
-          // Convert binary data to base64 encoding for each content document
-          const dataWithImages = await Promise.all(contents.map(async (content) => {
-            const { targetImage, contentImage, ...responseData } = content.toObject();
+        //   // Convert binary data to base64 encoding for each content document
+        //   const dataWithImages = await Promise.all(contents.map(async (content) => {
+        //     const { targetImage, contentImage, ...responseData } = content.toObject();
             
-            let targetImageBase64 = '';
-            if (targetImage) {
-                const targetImageBuffer = Buffer.from(targetImage, 'binary');
-                targetImageBase64 = targetImageBuffer.toString('base64');
-            }
+        //     let targetImageBase64 = '';
+        //     if (targetImage) {
+        //         const targetImageBuffer = Buffer.from(targetImage, 'binary');
+        //         targetImageBase64 = targetImageBuffer.toString('base64');
+        //     }
 
-            let contentImageBase64 = '';
-            if (contentImage) {
-                const contentImageBuffer = Buffer.from(contentImage, 'binary');
-                contentImageBase64 = contentImageBuffer.toString('base64');
-            }
+        //     let contentImageBase64 = '';
+        //     if (contentImage) {
+        //         const contentImageBuffer = Buffer.from(contentImage, 'binary');
+        //         contentImageBase64 = contentImageBuffer.toString('base64');
+        //     }
 
-            return {
-                ...responseData,
-                targetImage: targetImageBase64,
-                contentImage: contentImageBase64,
-            };
-        }));
+        //     return {
+        //         ...responseData,
+        //         targetImage: targetImageBase64,
+        //         contentImage: contentImageBase64,
+        //     };
+        // }));
 
 
         //CREATE PAGINATION
@@ -249,7 +253,108 @@ const getAllContent = async (req: Request, res: Response, next: NextFunction) =>
             currentPage: pageOptions.page,
         };
 
-        return jsonAll<any>(res, 200, dataWithImages, meta);
+        return jsonAll<any>(res, 200, contents, meta);
+    } catch (error) {
+        Logging.error(`Error fetching content: ${error}`);
+        next(error);
+    }
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * @openapi
+ * '/api/v1/content/fetch/active':
+ *  get:
+ *     tags:
+ *     - Content
+ *     summary: Fetch All Contents
+ *     responses:
+ *       200:
+ *         description: Content List
+ *         content:
+ *          application/json:
+ *           schema:
+ *              $ref: '#/components/schemas/ContentAllResponse'
+ *           example:
+ *             data:
+ *               - "_id": "65cafd1a91f0f81fbfd1d499"
+ *                 "targetImage": "base64encoding"
+ *                 "contentImage": "base64encoding"
+ *                 "meshColor": "0x0000ff"
+ *                 "imageTargetSrc": "https://finalar.github.io/imageTargets/targets2.mind"
+ *                 "modelPath": "https://finalar.github.io/models/SurveySet/"
+ *                 "modelFile": "FoodPackDDFGH.glb"
+ *                 "progressPhase": "phase 2"
+ *                 "positionY": "0"
+ *                 "scaleSet": "0.3"
+ *                 "size": "11173332"
+ *                 "createdDate": "2000-01-12T08:30:00.000Z"
+ *                 "lastUpdatedDate": "2000-01-12T08:30:00.000Z"
+ *                 "ref_ver": 1
+ *                 "createdAt": "2024-02-13T05:24:42.484Z"
+ *                 "updatedAt": "2024-02-13T05:24:42.484Z"
+ *                 "__v": 0
+ *             meta:
+ *               total: 8
+ *               limit: 10
+ *               totalPages: 1
+ *               currentPage: 1
+ */
+
+//GET ALL ACTIVE CONTENT LIST
+const getAllActiveContent = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        let pageOptions: { page: number; limit: number } = {
+            page: Number(req.query.page) || 1,
+            limit: Number(req.query.limit) || 10,
+        };
+
+        const count = await Content.countDocuments({"flag": true});
+
+        Logging.debug(`Number Of Documents = ${count}`);
+
+        //GETING DATA FROM TABLE
+        let contents = await Content.find({flag: true})
+            //.populate('meshColor')
+            .limit(pageOptions.limit * 1)
+            .skip((pageOptions.page - 1) * pageOptions.limit)
+            .sort({ createdAt: -1 });
+
+        Logging.debug(`First Query = ${contents}`);
+
+        //   // Convert binary data to base64 encoding for each content document
+        //   const dataWithImages = await Promise.all(contents.map(async (content) => {
+        //     const { targetImage, contentImage, ...responseData } = content.toObject();
+            
+        //     let targetImageBase64 = '';
+        //     if (targetImage) {
+        //         const targetImageBuffer = Buffer.from(targetImage, 'binary');
+        //         targetImageBase64 = targetImageBuffer.toString('base64');
+        //     }
+
+        //     let contentImageBase64 = '';
+        //     if (contentImage) {
+        //         const contentImageBuffer = Buffer.from(contentImage, 'binary');
+        //         contentImageBase64 = contentImageBuffer.toString('base64');
+        //     }
+
+        //     return {
+        //         ...responseData,
+        //         targetImage: targetImageBase64,
+        //         contentImage: contentImageBase64,
+        //     };
+        // }));
+
+
+        //CREATE PAGINATION
+        const meta = {
+            total: count,
+            limit: pageOptions.limit,
+            totalPages: Math.ceil(count / pageOptions.limit),
+            currentPage: pageOptions.page,
+        };
+
+        return jsonAll<any>(res, 200, contents, meta);
     } catch (error) {
         Logging.error(`Error fetching content: ${error}`);
         next(error);
@@ -308,6 +413,8 @@ const updateContent = async (req: Request, res: Response, next: NextFunction) =>
             });
         }
 
+        let newRefVer = content.ref_ver + 1;
+
         const targetImageBinary = Buffer.from(body.targetImage, 'base64');
         const contentImageBinary = Buffer.from(body.contentImage, 'base64');
 
@@ -322,11 +429,103 @@ const updateContent = async (req: Request, res: Response, next: NextFunction) =>
                 positionY: body.positionY,
                 scaleSet: body.scaleSet,
                 size: body.size,
-                ref_ver: 1,
+                ref_ver: newRefVer,
             },
             { new: true }
         );
         return jsonOne(res, 200, savedContent);
+    } catch (error) {
+        next(error);
+    }
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * @openapi
+ * /api/v1/content/{contentId}/addContents:
+ *  put:
+  *     tags:
+ *     - Content
+ *     summary: Update Contents by Id
+ *     parameters:
+ *       - in: path
+ *         name: contentId
+ *         required: true
+ *         description: ID of the content to update
+ *         schema:
+ *           type: string
+ *           example: 65cafd1a91f0f81fbfd1d499
+ *     responses:
+ *       200:
+ *         description: Content Details
+ *         content:
+ *          application/json:
+ *           schema:
+ *              $ref: '#/components/schemas/Content'
+ *           example:
+ *             "targetImageHash": "phashvalue"
+ *             "targetImage": "base64encoding"
+ *             "contentImage": "base64encoding"
+ *             "meshColor": "0x0000ff"
+ *             "imageTargetSrc": "https://finalar.github.io/imageTargets/target_datestamp_timestamp.mind"
+ *             "modelPath": "https://finalar.github.io/models/SurveySet/"
+ *             "modelFile": "mode_dateStamp_timeStamp.glb"
+ *             "positionY": "0"
+ *             "scaleSet": "0.3"
+ *             "size": "11173332"
+ *             "ref_ver": 1
+ */
+
+//ADD ANOTHER CONTENT DETAILS WITH ID TO SAME TARGET
+const addLinkingContent = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        Logging.debug(`Request Body = ${req.body}`);
+
+        const { contentImage, modelPath, modelFile, positionY, scaleSet, size } = req.body;
+        const contentId = req.params.contentId;
+
+        let content = await Content.findById(contentId);
+        //If Content not found
+        if (!content) {
+            throw new HttpError({
+                title: 'bad_request',
+                detail: 'Content Not Found.',
+                code: 400,
+            });
+        }
+
+        const contentImageBinary = Buffer.from(contentImage, 'base64');
+
+        //function generate analytix matrix
+        //analyzeContent()
+
+         // Extract targetImage and contentImage from the content document
+         const { targetImageHash, targetImage, imageTargetSrc } = content.toObject();
+   
+
+        //CREATE NEW CONTENT MAPPING
+        let contentData = new Content({
+            targetImageHash,
+            targetImage,
+            imageTargetSrc,
+            contentImage: contentImageBinary,
+            modelPath,
+            modelFile,
+            positionY,
+            scaleSet,
+            size,
+            // generate analytic Matrix should also included or create a seperate collection and create a related document to it
+            // createdDate: currentTimestamp,
+            // lastUpdatedDate: currentTimestamp,
+            ref_ver: 1,
+            flag:false
+        });
+
+        let savedContent = await contentData.save();
+
+        //SENDING RESPONSE
+        return jsonOne(res, 201, savedContent);
+
     } catch (error) {
         next(error);
     }
@@ -427,7 +626,7 @@ const deleteContent = async (req: Request, res: Response, next: NextFunction) =>
 const findBasedOnTarget = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const phashId = req.params.phashId;
-        const maxHammingDistance = 5; // Set your desired maximum Hamming distance here
+        const maxHammingDistance = 400; // Set your desired maximum Hamming distance here
 
         // Fetch all content documents from the database
         let contents = await Content.find();
@@ -485,53 +684,88 @@ function calculateHammingDistance(hash1: string, hash2: string): number {
     return distance;
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////
 
-// const findBasedOnTarget = async (req: Request, res: Response, next: NextFunction) => {
-//     try {
-//         const phashId = req.params.phashId;
+/**
+ * @openapi
+ * '/api/v1/content/findv2/{phashId}':
+ *  get:
+ *     tags:
+ *     - Content
+ *     summary: Fetch Contents by phashId
+ *     parameters:
+ *       - in: path
+ *         name: phashId
+ *         required: true
+ *         description: ID of the target to fetch
+ *         schema:
+ *           type: string
+ *           example: 65cafd1a91f0f81fbfd1d499
+ *     responses:
+ *       200:
+ *         description: Content Details
+ *         content:
+ *          application/json:
+ *           schema:
+ *              $ref: '#/components/schemas/ExperienceContent'
+ *           example:
+ *             "successOrFaliure": "Y"
+ *             "meshColor": "0x0000ff"
+ *             "imageTargetSrc": "https://finalar.github.io/imageTargets/targets2.mind"
+ *             "modelPath": "https://finalar.github.io/models/SurveySet/"
+ *             "modelFile": "FoodPackDDFGH.glb"
+ *             "progressPhase": "phase 2"
+ *             "positionY": "0"
+ *             "scaleSet": "0.3"
+ *             "size": "11173332"
+ *             "ref_ver": 1
+ */
+const findBasedOnTargetV2 = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const phashId = req.params.phashId;
 
-//         // Fetch the specific content document from the database
-//         //let content = await Content.findById(phashId);
-//         const hammingDistance = Number(req.query.hammingDistance) || 400;
+        // Fetch the specific content document from the database
+        //let content = await Content.findById(phashId);
+        const hammingDistance = Number(req.query.hammingDistance) || 400;
 
-//         //After finalizing the hamming distance use this
-//         // const hammingDistance = 200;
+        //After finalizing the hamming distance use this
+        // const hammingDistance = 200;
 
-//         // Find documents with targetImageHash within the specified hamming distance
-//         const content = await Content.find({
-//             targetImageHash: {
-//                 $regex: `^${phashId.slice(0, phashId.length - hammingDistance)}`,
-//             },
-//         });
+        // Find documents with targetImageHash within the specified hamming distance
+        const content = await Content.find({
+            targetImageHash: {
+                $regex: `^${phashId.slice(0, phashId.length - hammingDistance)}`,
+            },
+        });
 
-//         // If content is not found, return a 404 response
-//         if (!content) {
-//             return res.status(404).json({ successOrFaliure: 'N', message: 'Content not found' });
-//         }
+        // If content is not found, return a 404 response
+        if (!content) {
+            return res.status(404).json({ successOrFaliure: 'N', message: 'Content not found' });
+        }
 
         
-//         // Extract required data for AR experience from the content document
-//         const { meshColor, imageTargetSrc, modelPath, modelFile, progressPhase, positionY, scaleSet, size }= content.toObject();
+        // Extract required data for AR experience from the content document
+        const { meshColor, imageTargetSrc, modelPath, modelFile, progressPhase, positionY, scaleSet, size }= content[0].toObject();
 
 
-//         // Create a response object including targetImage and contentImage
-//         const data = {
-//             successOrFaliure: 'Y',
-//             meshColor: meshColor, 
-//             imageTargetSrc: imageTargetSrc, 
-//             modelPath: modelPath,
-//             modelFile: modelFile,
-//             progressPhase: progressPhase,
-//             positionY: positionY,
-//             scaleSet: scaleSet,
-//             size: size,
-//         };
+        // Create a response object including targetImage and contentImage
+        const data = {
+            successOrFaliure: 'Y',
+            meshColor: meshColor, 
+            imageTargetSrc: imageTargetSrc, 
+            modelPath: modelPath,
+            modelFile: modelFile,
+            progressPhase: progressPhase,
+            positionY: positionY,
+            scaleSet: scaleSet,
+            size: size,
+        };
 
-//         return jsonOne(res, 200, data);
-//     } catch (error) {
-//         next(error);
-//     }
-// };
+        return jsonOne(res, 200, data);
+    } catch (error) {
+        next(error);
+    }
+};
 
 // ANALYZE CONTENT function
 function analyzeContent(levels: number, obj: IQualityObj): string {
@@ -630,8 +864,12 @@ export default {
     createContent,//will include the analytic matrix generating logic
     getContent,
     getAllContent,
+    getAllActiveContent,
     updateContent,
     deleteContent,
     // analyzeContent,
     findBasedOnTarget,
+    findBasedOnTargetV2,
+    addLinkingContent,
+
 };

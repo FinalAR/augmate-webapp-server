@@ -15,6 +15,5 @@ export interface IQualityObj {
             l_polyCount: number;
             l_animCount: number;
         };
-        flag? : true;
     };
 }

@@ -31,11 +31,11 @@ const ContentSchema = new mongoose_1.Schema({
         required: true,
     },
     targetImage: {
-        type: Buffer,
+        type: String,
         required: true,
     },
     contentImage: {
-        type: Buffer,
+        type: String,
         required: true,
     },
     meshColor: {
@@ -84,6 +84,9 @@ const ContentSchema = new mongoose_1.Schema({
         type: Number,
         required: true,
         default: 1,
+    },
+    flag: {
+        type: Boolean,
     },
 }, { timestamps: true });
 //EXPORT
