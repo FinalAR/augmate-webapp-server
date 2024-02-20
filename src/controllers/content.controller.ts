@@ -913,8 +913,8 @@ const updateContentLinking = async (req: Request, res: Response, next: NextFunct
  * /api/v1/content/addContents/{documentId}:
  *  put:
   *     tags:
- *     - CONTENT LINKIN
- *     summary: Update Contents by Id
+ *     - CONTENT - CREATION AND LINKING DATA OPERATION
+ *     summary: Adding more Contents by Id to the same target
  *     parameters:
  *       - in: path
  *         name: documentId

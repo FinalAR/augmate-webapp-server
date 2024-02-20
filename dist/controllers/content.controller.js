@@ -833,8 +833,8 @@ const updateContentLinking = (req, res, next) => __awaiter(void 0, void 0, void 
  * /api/v1/content/addContents/{documentId}:
  *  put:
   *     tags:
- *     - CONTENT LINKIN
- *     summary: Update Contents by Id
+ *     - CONTENT - CREATION AND LINKING DATA OPERATION
+ *     summary: Adding more Contents by Id to the same target
  *     parameters:
  *       - in: path
  *         name: documentId
