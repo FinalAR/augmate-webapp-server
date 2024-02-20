@@ -7,6 +7,30 @@ const controllers_1 = require("../../controllers");
 const _router = (0, express_1.Router)({
     mergeParams: true,
 });
+//GET Content DETAILS BY ID
+_router
+    .route('/fetch/:contentId')
+    .get(
+// validate([authorization()]),
+// auth,
+// permit([RoleType.ADMIN, RoleType.USER]),
+controllers_1.contentController.getContent);
+//GET ALL CONTENTS
+_router
+    .route('/fetch')
+    .get(
+// validate([authorization()]),
+// auth,
+// permit([RoleType.ADMIN, RoleType.USER]),
+controllers_1.contentController.getAllContent);
+//GET ALL ACTIVE CONTENTS
+_router
+    .route('/list/active')
+    .get(
+// validate([authorization()]),
+// auth,
+// permit([RoleType.ADMIN, RoleType.USER]),
+controllers_1.contentController.getAllActiveContent);
 //CONTENT CREATION
 _router
     .route('/create')
@@ -17,8 +41,38 @@ _router
 //     password('confirmPassword'),
 // ]),
 controllers_1.contentController.createContent);
+//Target Update
+_router
+    .route('/target/:documentId')
+    .patch(
+// validate([
+//     emailAddress(),
+//     password('password'),
+//     password('confirmPassword'),
+// ]),
+controllers_1.contentController.updateTarget);
+//Content data Update
+_router
+    .route('/data/:documentId')
+    .patch(
+// validate([
+//     emailAddress(),
+//     password('password'),
+//     password('confirmPassword'),
+// ]),
+controllers_1.contentController.updateContent);
+//Content metadata Update
+_router
+    .route('/metadata/:documentId')
+    .patch(
+// validate([
+//     emailAddress(),
+//     password('password'),
+//     password('confirmPassword'),
+// ]),
+controllers_1.contentController.updateMetaData);
 //UPDATE CONTENT DETAILS
-_router.route('/update/:contentId').patch(
+_router.route('/update/:documentId').patch(
 // validate([
 //     authorization(),
 //     requiredTextField('firstName', 'FirstName', { min: 2, max: 255 }),
@@ -32,9 +86,33 @@ _router.route('/update/:contentId').patch(
 // ]),
 // auth,
 // permit([RoleType.ADMIN, RoleType.USER]),
-controllers_1.contentController.updateContent);
+controllers_1.contentController.updateAllData);
+//DELETE Content DETAILS BY ID
+_router
+    .route('/delete/:documentId')
+    .delete(
+// validate([authorization()]),
+// auth,
+// permit([RoleType.ADMIN, RoleType.USER]),
+controllers_1.contentController.deleteContent);
+//GET ALL ACTIVE CONTENT LIST
+_router
+    .route('/linking/:phashId')
+    .get(
+// validate([authorization()]),
+// auth,
+// permit([RoleType.ADMIN, RoleType.USER]),
+controllers_1.contentController.findAllContentsByTarget);
+//ACTIVATE A CONTENT LINKING TO A PARTICULAR TARGET
+_router
+    .route('/linking/:phashId')
+    .patch(
+// validate([authorization()]),
+// auth,
+// permit([RoleType.ADMIN, RoleType.USER]),
+controllers_1.contentController.updateContentLinking);
 //ADD CONTENT TO A TARGET DETAILS
-_router.route('/update/:contentId//addContents').patch(
+_router.route('//addContents/:documentId').patch(
 // validate([
 //     authorization(),
 //     requiredTextField('firstName', 'FirstName', { min: 2, max: 255 }),
@@ -49,38 +127,6 @@ _router.route('/update/:contentId//addContents').patch(
 // auth,
 // permit([RoleType.ADMIN, RoleType.USER]),
 controllers_1.contentController.addLinkingContent);
-//GET Content DETAILS BY ID
-_router
-    .route('/fetch/:contentId')
-    .get(
-// validate([authorization()]),
-// auth,
-// permit([RoleType.ADMIN, RoleType.USER]),
-controllers_1.contentController.getContent);
-//GET ALL ACTIVE CONTENTS
-_router
-    .route('/list/active')
-    .get(
-// validate([authorization()]),
-// auth,
-// permit([RoleType.ADMIN, RoleType.USER]),
-controllers_1.contentController.getAllActiveContent);
-//GET ALL CONTENTS
-_router
-    .route('/fetch')
-    .get(
-// validate([authorization()]),
-// auth,
-// permit([RoleType.ADMIN, RoleType.USER]),
-controllers_1.contentController.getAllContent);
-//DELETE Content DETAILS BY ID
-_router
-    .route('/delete/:contentId')
-    .delete(
-// validate([authorization()]),
-// auth,
-// permit([RoleType.ADMIN, RoleType.USER]),
-controllers_1.contentController.deleteContent);
 //FIND Content DETAILS BY TARGET phashID
 _router
     .route('/find/:phashId')
@@ -97,6 +143,14 @@ _router
 // auth,
 // permit([RoleType.ADMIN, RoleType.USER]),
 controllers_1.contentController.findBasedOnTargetV2);
+//TARGET LINKING CONTEN LISTNER ENPOINT
+_router
+    .route('/listner/:phashId')
+    .get(
+// validate([authorization()]),
+// auth,
+// permit([RoleType.ADMIN, RoleType.USER]),
+controllers_1.contentController.targetLinkedContentListner);
 //EXPORT
 exports.router = _router;
 //# sourceMappingURL=content.route.js.map

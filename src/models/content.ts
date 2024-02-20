@@ -55,12 +55,18 @@ import { IContent } from '../interfaces';
  *        - modeFile
  *        - size
  *       properties:
-*         targetImageHash:
+ *         targetImageHash:
  *           type: string 
  *         targetImage:
  *           type: string 
  *         contentImage:
- *           type: string    
+ *           type: string  
+ *         contentPath:
+ *           type: string  
+ *         description:
+ *           type: string  
+ *         analysis:
+ *           type: object
  *         meshColor:
  *           type: string
  *           default: '0x0000ff'
@@ -115,10 +121,18 @@ import { IContent } from '../interfaces';
  *       properties:
  *         _id:
  *           type: string
+ *         targetImageHash:
+ *           type: string 
  *         targetImage:
  *           type: string 
  *         contentImage:
- *           type: string 
+ *           type: string  
+ *         contentPath:
+ *           type: string  
+ *         description:
+ *           type: string  
+ *         analysis:
+ *           type: object
  *         meshColor:
  *           type: string
  *           default: '0x0000ff'
@@ -174,6 +188,16 @@ const ContentSchema: Schema = new Schema(
         contentImage: {
             type: String,
             required: true,
+        },
+        contentPath: {
+            type: String,
+            required: true,
+        },
+        description: {
+            type: String,
+        },
+        analysis: {
+            type: Object,
         },
         meshColor: {
             type: String,

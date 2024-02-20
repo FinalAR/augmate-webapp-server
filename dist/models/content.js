@@ -38,6 +38,16 @@ const ContentSchema = new mongoose_1.Schema({
         type: String,
         required: true,
     },
+    contentPath: {
+        type: String,
+        required: true,
+    },
+    description: {
+        type: String,
+    },
+    analysis: {
+        type: Object,
+    },
     meshColor: {
         type: String,
         default: '0x0000ff',
