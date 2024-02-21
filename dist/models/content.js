@@ -62,8 +62,7 @@ const ContentSchema = new mongoose_1.Schema({
     },
     modelFile: {
         type: String,
-        required: true,
-        unique: true,
+        required: true
     },
     progressPhase: {
         type: String,

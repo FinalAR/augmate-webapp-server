@@ -12,4 +12,5 @@ export interface IContent {
     scaleSet: string;
     size: string;
     ref_ver: number;
+    flag:boolean;
 }

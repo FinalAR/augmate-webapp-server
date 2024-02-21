@@ -213,8 +213,7 @@ const ContentSchema: Schema = new Schema(
         },
         modelFile: {
             type: String,
-            required: true,
-            unique: true,
+            required: true
         },
         progressPhase: {
             type: String,

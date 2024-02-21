@@ -956,6 +956,7 @@ const findBasedOnTarget = (req, res, next) => __awaiter(void 0, void 0, void 0, 
             const hammingDistance = calculateHammingDistance(phashId, currentHash);
             return hammingDistance <= maxHammingDistance;
         });
+        Logging_1.default.debug(`Content Details = ${similarContents}`);
         // If no similar content found, return a 404 response
         if (similarContents.length === 0) {
             return res.status(404).json({ successOrFaliure: 'N', message: 'No similar content found' });
@@ -967,18 +968,17 @@ const findBasedOnTarget = (req, res, next) => __awaiter(void 0, void 0, void 0, 
             return hammingDistanceA - hammingDistanceB;
         });
         // Extract required data for AR experience from the most similar content document
-        const { meshColor, imageTargetSrc, modelPath, modelFile, progressPhase, positionY, scaleSet, size } = similarContents[0].toObject();
+        const { _id, imageTargetSrc, contentPath, positionY, scaleSet, size, ref_ver } = similarContents[0].toObject();
         // Create a response object including targetImage and contentImage
         const data = {
             successOrFaliure: 'Y',
-            meshColor,
+            documentId: _id,
             imageTargetSrc,
-            modelPath,
-            modelFile,
-            progressPhase,
+            contentPath,
             positionY,
             scaleSet,
             size,
+            ref_ver
         };
         return (0, general_1.jsonOne)(res, 200, data);
     }
@@ -1037,7 +1037,7 @@ const findBasedOnTargetV2 = (req, res, next) => __awaiter(void 0, void 0, void 0
         const phashId = req.params.phashId;
         // Fetch the specific content document from the database
         //let content = await Content.findById(phashId);
-        const hammingDistance = Number(req.query.hammingDistance) || 400;
+        const hammingDistance = Number(req.query.hammingDistance) || 5;
         //After finalizing the hamming distance use this
         // const hammingDistance = 200;
         // Find documents with targetImageHash within the specified hamming distance
@@ -1051,18 +1051,18 @@ const findBasedOnTargetV2 = (req, res, next) => __awaiter(void 0, void 0, void 0
             return res.status(404).json({ successOrFaliure: 'N', message: 'Content not found' });
         }
         // Extract required data for AR experience from the content document
-        const { meshColor, imageTargetSrc, modelPath, modelFile, progressPhase, positionY, scaleSet, size } = content[0].toObject();
+        const { _id, imageTargetSrc, contentPath, positionY, scaleSet, size, ref_ver, targetpHash } = content[0].toObject();
         // Create a response object including targetImage and contentImage
         const data = {
             successOrFaliure: 'Y',
-            meshColor: meshColor,
-            imageTargetSrc: imageTargetSrc,
-            modelPath: modelPath,
-            modelFile: modelFile,
-            progressPhase: progressPhase,
-            positionY: positionY,
-            scaleSet: scaleSet,
-            size: size,
+            documentId: _id,
+            imageTargetSrc,
+            contentPath,
+            positionY,
+            scaleSet,
+            size,
+            targetpHash,
+            ref_ver
         };
         return (0, general_1.jsonOne)(res, 200, data);
     }
@@ -1146,13 +1146,13 @@ const targetLinkedContentListner = (req, res, next) => __awaiter(void 0, void 0,
                 code: 400,
             });
         }
-        // Find active content based on phashId, activeDocId, currentRefVer, and flag
-        let isActiveContent = yield content_1.default.findOne({
-            "_id": activeDocId,
-            "targetpHash": phashId,
-            "ref_ver": currentRefVer,
-            "flag": true
-        });
+        let isActiveContent = false;
+        if (activeContent._id.toString() === activeDocId) { // Check if the activeDocId matches
+            const { targetpHash, ref_ver, flag } = activeContent.toObject();
+            if (targetpHash === phashId && ref_ver === currentRefVer && flag === true) {
+                isActiveContent = true;
+            }
+        }
         if (!isActiveContent) {
             // If there's a change, return changed document ID and document
             return (0, general_1.jsonOne)(res, 201, {
@@ -1162,7 +1162,7 @@ const targetLinkedContentListner = (req, res, next) => __awaiter(void 0, void 0,
             });
         }
         // If there's no change, return the active document
-        return (0, general_1.jsonOne)(res, 200, { message: "You Re upto-date", updateFlag: "N" });
+        return (0, general_1.jsonOne)(res, 200, { message: "You are upto-date", updateFlag: "N" });
     }
     catch (error) {
         next(error);

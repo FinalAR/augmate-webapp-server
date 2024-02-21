@@ -1044,13 +1044,17 @@ const findBasedOnTarget = async (req: Request, res: Response, next: NextFunction
 
         // Fetch all content documents from the database
         let contents = await Content.find();
-
+        
+        
         // Filter documents based on the Hamming distance
         let similarContents = contents.filter(content => {
             const currentHash = content.targetpHash;
             const hammingDistance = calculateHammingDistance(phashId, currentHash);
             return hammingDistance <= maxHammingDistance;
         });
+
+
+        Logging.debug(`Content Details = ${similarContents}`);
 
         // If no similar content found, return a 404 response
         if (similarContents.length === 0) {
@@ -1065,19 +1069,18 @@ const findBasedOnTarget = async (req: Request, res: Response, next: NextFunction
         });
 
         // Extract required data for AR experience from the most similar content document
-        const { meshColor, imageTargetSrc, modelPath, modelFile, progressPhase, positionY, scaleSet, size } = similarContents[0].toObject();
+        const { _id, imageTargetSrc, contentPath, positionY, scaleSet, size, ref_ver } = similarContents[0].toObject();
 
         // Create a response object including targetImage and contentImage
         const data = {
             successOrFaliure: 'Y',
-            meshColor,
+            documentId:_id,
             imageTargetSrc,
-            modelPath,
-            modelFile,
-            progressPhase,
+            contentPath,
             positionY,
             scaleSet,
             size,
+            ref_ver
         };
 
         return jsonOne(res, 200, data);
@@ -1140,7 +1143,7 @@ const findBasedOnTargetV2 = async (req: Request, res: Response, next: NextFuncti
 
         // Fetch the specific content document from the database
         //let content = await Content.findById(phashId);
-        const hammingDistance = Number(req.query.hammingDistance) || 400;
+        const hammingDistance = Number(req.query.hammingDistance) || 5;
 
         //After finalizing the hamming distance use this
         // const hammingDistance = 200;
@@ -1159,20 +1162,20 @@ const findBasedOnTargetV2 = async (req: Request, res: Response, next: NextFuncti
 
 
         // Extract required data for AR experience from the content document
-        const { meshColor, imageTargetSrc, modelPath, modelFile, progressPhase, positionY, scaleSet, size } = content[0].toObject();
+        const { _id, imageTargetSrc, contentPath, positionY, scaleSet, size, ref_ver, targetpHash } = content[0].toObject();
 
 
         // Create a response object including targetImage and contentImage
         const data = {
             successOrFaliure: 'Y',
-            meshColor: meshColor,
-            imageTargetSrc: imageTargetSrc,
-            modelPath: modelPath,
-            modelFile: modelFile,
-            progressPhase: progressPhase,
-            positionY: positionY,
-            scaleSet: scaleSet,
-            size: size,
+            documentId:_id,
+            imageTargetSrc,
+            contentPath,
+            positionY,
+            scaleSet,
+            size,
+            targetpHash,
+            ref_ver
         };
 
         return jsonOne(res, 200, data);
@@ -1262,13 +1265,13 @@ const targetLinkedContentListner = async (req: Request, res: Response, next: Nex
             });
         }
 
-        // Find active content based on phashId, activeDocId, currentRefVer, and flag
-        let isActiveContent = await Content.findOne({
-            "_id": activeDocId,
-            "targetpHash": phashId,
-            "ref_ver": currentRefVer,
-            "flag": true
-        });
+        let isActiveContent = false;
+        if (activeContent._id.toString() === activeDocId) { // Check if the activeDocId matches
+            const { targetpHash, ref_ver, flag } = activeContent.toObject();
+            if (targetpHash === phashId && ref_ver === currentRefVer && flag === true) {
+                isActiveContent = true;
+            }
+        }
 
         if (!isActiveContent) {
             // If there's a change, return changed document ID and document
@@ -1277,10 +1280,10 @@ const targetLinkedContentListner = async (req: Request, res: Response, next: Nex
                 document: activeContent,
                 updateFlag: 'Y'
             });
-
         }
+
         // If there's no change, return the active document
-        return jsonOne(res, 200, {message:"You Re upto-date", updateFlag:"N"});
+        return jsonOne(res, 200, {message:"You are upto-date", updateFlag:"N"});
 
     } catch (error) {
         next(error);
