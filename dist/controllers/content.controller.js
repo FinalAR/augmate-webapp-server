@@ -947,7 +947,7 @@ const addLinkingContent = (req, res, next) => __awaiter(void 0, void 0, void 0, 
 const findBasedOnTarget = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const phashId = req.params.phashId;
-        const maxHammingDistance = 400; // Set your desired maximum Hamming distance here
+        const maxHammingDistance = 30; // Set your desired maximum Hamming distance here
         // Fetch all content documents from the database
         let contents = yield content_1.default.find();
         // Filter documents based on the Hamming distance
@@ -1037,7 +1037,7 @@ const findBasedOnTargetV2 = (req, res, next) => __awaiter(void 0, void 0, void 0
         const phashId = req.params.phashId;
         // Fetch the specific content document from the database
         //let content = await Content.findById(phashId);
-        const hammingDistance = Number(req.query.hammingDistance) || 5;
+        const hammingDistance = Number(req.query.hammingDistance) || 30;
         //After finalizing the hamming distance use this
         // const hammingDistance = 200;
         // Find documents with targetImageHash within the specified hamming distance
@@ -1047,7 +1047,7 @@ const findBasedOnTargetV2 = (req, res, next) => __awaiter(void 0, void 0, void 0
             },
         });
         // If content is not found, return a 404 response
-        if (!content) {
+        if (content.length === 0) {
             return res.status(404).json({ successOrFaliure: 'N', message: 'Content not found' });
         }
         // Extract required data for AR experience from the content document
@@ -1222,6 +1222,5 @@ exports.default = {
     findBasedOnTarget,
     findBasedOnTargetV2,
     targetLinkedContentListner,
-    // analyzeContent,
 };
 //# sourceMappingURL=content.controller.js.map

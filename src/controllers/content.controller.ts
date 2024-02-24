@@ -1040,7 +1040,7 @@ const addLinkingContent = async (req: Request, res: Response, next: NextFunction
 const findBasedOnTarget = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const phashId = req.params.phashId;
-        const maxHammingDistance = 400; // Set your desired maximum Hamming distance here
+        const maxHammingDistance = 30; // Set your desired maximum Hamming distance here
 
         // Fetch all content documents from the database
         let contents = await Content.find();
@@ -1143,7 +1143,7 @@ const findBasedOnTargetV2 = async (req: Request, res: Response, next: NextFuncti
 
         // Fetch the specific content document from the database
         //let content = await Content.findById(phashId);
-        const hammingDistance = Number(req.query.hammingDistance) || 5;
+        const hammingDistance = Number(req.query.hammingDistance) || 30;
 
         //After finalizing the hamming distance use this
         // const hammingDistance = 200;
@@ -1155,8 +1155,9 @@ const findBasedOnTargetV2 = async (req: Request, res: Response, next: NextFuncti
             },
         });
 
+        
         // If content is not found, return a 404 response
-        if (!content) {
+        if (content.length === 0) {
             return res.status(404).json({ successOrFaliure: 'N', message: 'Content not found' });
         }
 
@@ -1361,5 +1362,4 @@ export default {
     findBasedOnTarget,
     findBasedOnTargetV2,
     targetLinkedContentListner,
-    // analyzeContent,
 };
