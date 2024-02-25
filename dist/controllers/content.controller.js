@@ -948,15 +948,22 @@ const findBasedOnTarget = (req, res, next) => __awaiter(void 0, void 0, void 0, 
     try {
         const phashId = req.params.phashId;
         const maxHammingDistance = 30; // Set your desired maximum Hamming distance here
-        // Fetch all content documents from the database
-        let contents = yield content_1.default.find();
+        const count = yield content_1.default.countDocuments({ "flag": true });
+        Logging_1.default.debug(`Number Of Documents = ${count}`);
+        // Fetch all active content documents from the database
+        let contents = yield content_1.default.find({ flag: true });
+        // Logging.debug(`Active content details: ${JSON.stringify(contents)}`);
         // Filter documents based on the Hamming distance
         let similarContents = contents.filter(content => {
+            Logging_1.default.debug(`Taken Contents ${JSON.stringify(content)}`);
             const currentHash = content.targetpHash;
+            Logging_1.default.debug(`content TargetpHash ${content.targetpHash}`);
+            Logging_1.default.debug(`Hamming distance for ${phashId} and ${currentHash}`);
             const hammingDistance = calculateHammingDistance(phashId, currentHash);
+            Logging_1.default.debug(`Hamming distance for ${phashId} and ${currentHash}: ${hammingDistance}`);
             return hammingDistance <= maxHammingDistance;
         });
-        Logging_1.default.debug(`Content Details = ${similarContents}`);
+        Logging_1.default.debug(`Similar content details: ${JSON.stringify(similarContents)}`);
         // If no similar content found, return a 404 response
         if (similarContents.length === 0) {
             return res.status(404).json({ successOrFaliure: 'N', message: 'No similar content found' });
@@ -965,6 +972,8 @@ const findBasedOnTarget = (req, res, next) => __awaiter(void 0, void 0, void 0, 
         similarContents.sort((a, b) => {
             const hammingDistanceA = calculateHammingDistance(phashId, a.targetpHash);
             const hammingDistanceB = calculateHammingDistance(phashId, b.targetpHash);
+            Logging_1.default.debug(`Hamming distance for ${phashId} and ${a.targetpHash}: ${hammingDistanceA}`);
+            Logging_1.default.debug(`Hamming distance for ${phashId} and ${b.targetpHash}: ${hammingDistanceB}`);
             return hammingDistanceA - hammingDistanceB;
         });
         // Extract required data for AR experience from the most similar content document

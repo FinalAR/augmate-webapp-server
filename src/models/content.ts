@@ -177,7 +177,7 @@ export interface IContnetModel extends IContent, Document { }
 //DEFINE USER SCHEMA
 const ContentSchema: Schema = new Schema(
     {
-        targetImageHash: {
+        targetpHash: {
             type: String,
             required: true,
         },
@@ -187,11 +187,9 @@ const ContentSchema: Schema = new Schema(
         },
         contentImage: {
             type: String,
-            required: true,
         },
         contentPath: {
             type: String,
-            required: true,
         },
         description: {
             type: String,
@@ -209,11 +207,9 @@ const ContentSchema: Schema = new Schema(
         },
         modelPath: {
             type: String,
-            required: true,
         },
         modelFile: {
             type: String,
-            required: true
         },
         progressPhase: {
             type: String,

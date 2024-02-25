@@ -26,7 +26,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importStar(require("mongoose"));
 //DEFINE USER SCHEMA
 const ContentSchema = new mongoose_1.Schema({
-    targetImageHash: {
+    targetpHash: {
         type: String,
         required: true,
     },
@@ -36,11 +36,9 @@ const ContentSchema = new mongoose_1.Schema({
     },
     contentImage: {
         type: String,
-        required: true,
     },
     contentPath: {
         type: String,
-        required: true,
     },
     description: {
         type: String,
@@ -58,11 +56,9 @@ const ContentSchema = new mongoose_1.Schema({
     },
     modelPath: {
         type: String,
-        required: true,
     },
     modelFile: {
         type: String,
-        required: true
     },
     progressPhase: {
         type: String,

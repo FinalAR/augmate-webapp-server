@@ -4,7 +4,7 @@ export interface IContent {
     contentImage: string; // url string
     meshColor: string;
     imageTargetSrc: string;
-    contentPath: String;
+    contentPath: string;
     modelPath: string;
     modelFile: string;
     progressPhase: string;
@@ -12,5 +12,5 @@ export interface IContent {
     scaleSet: string;
     size: string;
     ref_ver: number;
-    flag:boolean;
+    flag: boolean;
 }

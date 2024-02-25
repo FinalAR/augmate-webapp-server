@@ -1042,19 +1042,28 @@ const findBasedOnTarget = async (req: Request, res: Response, next: NextFunction
         const phashId = req.params.phashId;
         const maxHammingDistance = 30; // Set your desired maximum Hamming distance here
 
-        // Fetch all content documents from the database
-        let contents = await Content.find();
+        const count = await Content.countDocuments({ "flag": true });
+
+        Logging.debug(`Number Of Documents = ${count}`);
+
+        // Fetch all active content documents from the database
+        let contents = await Content.find({ flag: true });
         
-        
+        // Logging.debug(`Active content details: ${JSON.stringify(contents)}`);
+
         // Filter documents based on the Hamming distance
         let similarContents = contents.filter(content => {
+            Logging.debug(`Taken Contents ${JSON.stringify(content)}`);
             const currentHash = content.targetpHash;
+            Logging.debug(`content TargetpHash ${content.targetpHash}`);
+            Logging.debug(`Hamming distance for ${phashId} and ${currentHash}`);
             const hammingDistance = calculateHammingDistance(phashId, currentHash);
+            Logging.debug(`Hamming distance for ${phashId} and ${currentHash}: ${hammingDistance}`);
             return hammingDistance <= maxHammingDistance;
         });
 
 
-        Logging.debug(`Content Details = ${similarContents}`);
+        Logging.debug(`Similar content details: ${JSON.stringify(similarContents)}`);
 
         // If no similar content found, return a 404 response
         if (similarContents.length === 0) {
@@ -1065,6 +1074,8 @@ const findBasedOnTarget = async (req: Request, res: Response, next: NextFunction
         similarContents.sort((a, b) => {
             const hammingDistanceA = calculateHammingDistance(phashId, a.targetpHash);
             const hammingDistanceB = calculateHammingDistance(phashId, b.targetpHash);
+            Logging.debug(`Hamming distance for ${phashId} and ${a.targetpHash}: ${hammingDistanceA}`);
+            Logging.debug(`Hamming distance for ${phashId} and ${b.targetpHash}: ${hammingDistanceB}`);
             return hammingDistanceA - hammingDistanceB;
         });
 
