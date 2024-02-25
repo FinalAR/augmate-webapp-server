@@ -977,11 +977,12 @@ const findBasedOnTarget = (req, res, next) => __awaiter(void 0, void 0, void 0, 
             return hammingDistanceA - hammingDistanceB;
         });
         // Extract required data for AR experience from the most similar content document
-        const { _id, imageTargetSrc, contentPath, positionY, scaleSet, size, ref_ver } = similarContents[0].toObject();
+        const { _id, targetpHash, imageTargetSrc, contentPath, positionY, scaleSet, size, ref_ver } = similarContents[0].toObject();
         // Create a response object including targetImage and contentImage
         const data = {
             successOrFaliure: 'Y',
             documentId: _id,
+            targetpHash,
             imageTargetSrc,
             contentPath,
             positionY,
