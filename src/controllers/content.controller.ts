@@ -1155,7 +1155,7 @@ const findBasedOnTargetV2 = async (req: Request, res: Response, next: NextFuncti
 
         // Fetch the specific content document from the database
         //let content = await Content.findById(phashId);
-        const hammingDistance = Number(req.query.hammingDistance) || 30;
+        const hammingDistance = Number(req.query.hammingDistance) || 0;
 
         //After finalizing the hamming distance use this
         // const hammingDistance = 200;
@@ -1165,6 +1165,7 @@ const findBasedOnTargetV2 = async (req: Request, res: Response, next: NextFuncti
             targetpHash: {
                 $regex: `^${phashId.slice(0, phashId.length - hammingDistance)}`,
             },
+            flag: true
         });
 
         
