@@ -1165,10 +1165,23 @@ const targetLinkedContentListner = (req, res, next) => __awaiter(void 0, void 0,
             }
         }
         if (!isActiveContent) {
+            // Extract required data for AR experience from the content document
+            const { _id, imageTargetSrc, contentPath, positionY, scaleSet, size, ref_ver, targetpHash } = activeContent.toObject();
+            // Create a response object including targetImage and contentImage
+            const data = {
+                documentId: _id,
+                imageTargetSrc,
+                contentPath,
+                positionY,
+                scaleSet,
+                size,
+                targetpHash,
+                ref_ver
+            };
             // If there's a change, return changed document ID and document
             return (0, general_1.jsonOne)(res, 201, {
                 changedDocumentId: activeContent._id,
-                document: activeContent,
+                document: data,
                 updateFlag: 'Y'
             });
         }

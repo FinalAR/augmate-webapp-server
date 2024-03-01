@@ -1048,7 +1048,7 @@ const findBasedOnTarget = async (req: Request, res: Response, next: NextFunction
 
         // Fetch all active content documents from the database
         let contents = await Content.find({ flag: true });
-        
+
         // Logging.debug(`Active content details: ${JSON.stringify(contents)}`);
 
         // Filter documents based on the Hamming distance
@@ -1085,7 +1085,7 @@ const findBasedOnTarget = async (req: Request, res: Response, next: NextFunction
         // Create a response object including targetImage and contentImage
         const data = {
             successOrFaliure: 'Y',
-            documentId:_id,
+            documentId: _id,
             targetpHash,
             imageTargetSrc,
             contentPath,
@@ -1168,7 +1168,7 @@ const findBasedOnTargetV2 = async (req: Request, res: Response, next: NextFuncti
             flag: true
         });
 
-        
+
         // If content is not found, return a 404 response
         if (content.length === 0) {
             return res.status(404).json({ successOrFaliure: 'N', message: 'Content not found' });
@@ -1182,7 +1182,7 @@ const findBasedOnTargetV2 = async (req: Request, res: Response, next: NextFuncti
         // Create a response object including targetImage and contentImage
         const data = {
             successOrFaliure: 'Y',
-            documentId:_id,
+            documentId: _id,
             imageTargetSrc,
             contentPath,
             positionY,
@@ -1287,17 +1287,35 @@ const targetLinkedContentListner = async (req: Request, res: Response, next: Nex
             }
         }
 
+
         if (!isActiveContent) {
+
+            // Extract required data for AR experience from the content document
+            const { _id, imageTargetSrc, contentPath, positionY, scaleSet, size, ref_ver, targetpHash } = activeContent.toObject();
+
+
+            // Create a response object including targetImage and contentImage
+            const data = {
+                documentId: _id,
+                imageTargetSrc,
+                contentPath,
+                positionY,
+                scaleSet,
+                size,
+                targetpHash,
+                ref_ver
+            };
+            
             // If there's a change, return changed document ID and document
             return jsonOne(res, 201, {
                 changedDocumentId: activeContent._id,
-                document: activeContent,
+                document: data,
                 updateFlag: 'Y'
             });
         }
 
         // If there's no change, return the active document
-        return jsonOne(res, 200, {message:"You are upto-date", updateFlag:"N"});
+        return jsonOne(res, 200, { message: "You are upto-date", updateFlag: "N" });
 
     } catch (error) {
         next(error);

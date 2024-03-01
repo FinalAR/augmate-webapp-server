@@ -147,7 +147,7 @@ _router
 
 
 //ADD CONTENT TO A TARGET DETAILS
-_router.route('//addContents/:documentId').patch(
+_router.route('/addContents/:documentId').patch(
     // validate([
     //     authorization(),
     //     requiredTextField('firstName', 'FirstName', { min: 2, max: 255 }),
