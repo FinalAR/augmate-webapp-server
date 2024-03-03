@@ -11,3 +11,4 @@ MongoDB |
 chalk |
 nodemon |
 vercel |
+s3
