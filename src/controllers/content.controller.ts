@@ -5,6 +5,8 @@ import Logging from '../library/Logging';
 import Content, { IContnetModel } from '../models/content';
 import { IQualityObj } from '../interfaces/contentQuality';
 
+import { generateUploadURL } from '../utils/s3Handler'
+
 ////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
@@ -1322,7 +1324,6 @@ const targetLinkedContentListner = async (req: Request, res: Response, next: Nex
     }
 };
 
-
 // ANALYZE CONTENT function
 function analyzeContent(levels: number, obj: IQualityObj): string {
     const { high, mid, low } = obj.content;
@@ -1372,6 +1373,20 @@ function analyzeContent(levels: number, obj: IQualityObj): string {
 }
 
 
+
+//GET S3 PresignedURL
+const getPresignedUrl = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const url = await generateUploadURL()
+
+        Logging.debug(`Query URL Results = ${url}`);
+
+        return jsonOne(res, 200, url);
+    } catch (error) {
+        next(error);
+    }
+};
+
 //EXPORT
 export default {
     // Tag - CONTENT - GENREAL RETRIVALS
@@ -1393,4 +1408,6 @@ export default {
     findBasedOnTarget,
     findBasedOnTargetV2,
     targetLinkedContentListner,
+    //S3 Bucket handler
+    getPresignedUrl
 };

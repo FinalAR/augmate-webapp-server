@@ -151,6 +151,14 @@ _router
 // auth,
 // permit([RoleType.ADMIN, RoleType.USER]),
 controllers_1.contentController.targetLinkedContentListner);
+// S3 Presigned URLS
+_router
+    .route('/presignedUrl')
+    .get(
+// validate([authorization()]),
+// auth,
+// permit([RoleType.ADMIN, RoleType.USER]),
+controllers_1.contentController.getPresignedUrl);
 //EXPORT
 exports.router = _router;
 //# sourceMappingURL=content.route.js.map

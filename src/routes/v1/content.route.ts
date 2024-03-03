@@ -198,5 +198,15 @@ _router
         contentController.targetLinkedContentListner
     );
 
+// S3 Presigned URLS
+    _router
+    .route('/presignedUrl')
+    .get(
+        // validate([authorization()]),
+        // auth,
+        // permit([RoleType.ADMIN, RoleType.USER]),
+        contentController.getPresignedUrl
+    );
+
 //EXPORT
 export const router = _router;

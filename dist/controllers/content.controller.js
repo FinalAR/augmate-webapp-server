@@ -16,6 +16,7 @@ const httpError_1 = __importDefault(require("../utils/httpError"));
 const general_1 = require("../utils/general");
 const Logging_1 = __importDefault(require("../library/Logging"));
 const content_1 = __importDefault(require("../models/content"));
+const s3Handler_1 = require("../utils/s3Handler");
 ////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  * @openapi
@@ -1225,6 +1226,17 @@ function analyzeContent(levels, obj) {
     const analyticMatrix = "hi";
     return analyticMatrix;
 }
+//GET S3 PresignedURL
+const getPresignedUrl = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const url = yield (0, s3Handler_1.generateUploadURL)();
+        Logging_1.default.debug(`Query URL Results = ${url}`);
+        return (0, general_1.jsonOne)(res, 200, url);
+    }
+    catch (error) {
+        next(error);
+    }
+});
 //EXPORT
 exports.default = {
     // Tag - CONTENT - GENREAL RETRIVALS
@@ -1246,5 +1258,7 @@ exports.default = {
     findBasedOnTarget,
     findBasedOnTargetV2,
     targetLinkedContentListner,
+    //S3 Bucket handler
+    getPresignedUrl
 };
 //# sourceMappingURL=content.controller.js.map
