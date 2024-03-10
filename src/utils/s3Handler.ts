@@ -9,7 +9,7 @@ const bucketName = process.env.BUCKET;
 const accessKeyId = process.env.S3_ACCESS_KEY_ID
 const secretAccessKey = process.env.S3_SECRET_ACCESS_KEY;
 
-const s3BaseUrl = `https://${bucketName}.${region}.amazonaws.com\/`
+const s3BaseUrl = `https://${bucketName}.s3.${region}.amazonaws.com\/`
 
 const s3 = new S3({
   region,
